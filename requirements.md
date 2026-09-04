@@ -50,6 +50,7 @@ For a selected verse or passage, provide quick, intentionally scoped actions:
 
 - **Deeper context:** historical setting, immediate literary context, key terms, and major interpretive considerations.
 - **Related verses:** thematically and textually connected passages, with a short explanation of each connection.
+- **Word study:** for Bible passages, explain important Hebrew, Aramaic, or Greek words in context. Show transliteration, a concise gloss, relevant grammar, translation differences, and linked occurrences elsewhere in scripture.
 - **Study questions:** optional reflection/discussion prompts (nice-to-have for MVP).
 - **Ask about this passage:** an inline custom-question field that keeps the selected verse or passage in context. For example: “What does this phrase mean?”, “How have major traditions interpreted this?”, or “What should I read next to understand this?”
 
@@ -62,6 +63,8 @@ AI responses must:
 - Cite or link the underlying scripture references.
 - Avoid inventing quotations, sources, historical facts, or confidence.
 - Include a brief notice that AI assistance may be incomplete and should be checked against reliable sources.
+
+Word-study responses must name the source-language text/edition used, distinguish lexical range from the meaning in this specific passage, and avoid presenting a single "secret" English meaning. The feature is Bible-specific; for Book of Mormon passages, it should be unavailable or clearly explain that an equivalent recoverable original-language text is not available.
 
 ## 5. Decisions to make before implementation
 
@@ -169,7 +172,7 @@ Open question: Do you prefer one shared invite password for trusted friends, or 
 | --- | --- | --- |
 | 0 — Validate | Content licensing, source strategy, AI response rubric | Confirm what text and reference material we may show. |
 | 1 — Reader | KJV + WEB reader, Book of Mormon reader, navigation/search, responsive UI | A trustworthy, fast multi-scripture reading experience. |
-| 2 — Study tools | Scoped AI context, related verses, custom questions, Bible Hub links | The differentiating study experience. |
+| 2 — Study tools | Scoped AI context, related verses, word studies, custom questions, Bible Hub links | The differentiating study experience. |
 | 3 — Personal workspace | Optional accounts, sync, notes, highlights, export/delete | Long-term personal study utility. |
 | 4 — Additional works | More approved translations and selected works | Broader coverage, if validated. |
 
