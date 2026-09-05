@@ -9,6 +9,7 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 ## Product and reader behavior
 
 - Use Next.js App Router, TypeScript, Node 22, and Firebase App Hosting. Pin the app to an App Hosting-supported Next.js 15.2.x release and use the standard build command.
+- The root route starts with a scripture chooser containing one enabled option, **Holy Bible**, followed by a book chooser and chapter chooser. Choosing a chapter opens its reader route. A valid direct reader URL bypasses this onboarding flow, and returning readers may resume their locally stored last passage.
 - Reader routes are `/bible/:book/:chapter` with an optional `verse` query parameter. The selected translation and last read reference persist locally; direct links always open the stated verse.
 - At rest, show scripture with only a compact header: book navigation back arrow, centered passage title, and Settings icon. Do not show a persistent chapter subtitle, study controls, or comparison UI in the reader.
 - Settings controls the primary translation and an optional comparison mode. Normal reading shows one translation; comparison renders aligned KJV and WEB columns on desktop and an inline switcher on mobile.
@@ -23,7 +24,7 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 - Commit the generated, normalized per-translation/per-chapter JSON and compact reference/phrase-search index. Deployment builds must not fetch scripture content from third parties.
 - Use the eBible WEBP 2020 stable text and retain its required naming/trademark guidance. Pin the exact KJV edition used before import.
 - Add a visible Sources & Licenses view in Settings. It distinguishes: locally bundled Bible text, STEPBible source-language data, AI-generated study guidance, and external Bible Hub links.
-- Bundle the necessary STEPBible tagged original-language text, brief lexicon, and morphology data under CC BY 4.0 with prominent attribution and an upstream link. Do not bundle full lexicons or unrelated datasets.
+- Pin the exact STEPBible source-language, lexicon, and morphology files required for word study. Record the version, checksum, upstream URL, and license for every file in the source manifest; do not assume all STEPBible datasets share one license. Bundle only files whose recorded license permits the intended use, with required attribution and change notices. Do not bundle full lexicons or unrelated datasets.
 
 ## AI, access, and data handling
 
@@ -39,7 +40,7 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 
 ## Validation and delivery sequence
 
-1. Build and test the reader, corpus importer, direct URLs, reference/exact-phrase search, settings, comparison, mobile layout, and Bible Hub links.
+1. Build and test the scripture → book → chapter entry flow, reader, corpus importer, direct URLs, reference/exact-phrase search, settings, comparison, mobile layout, and Bible Hub links.
 2. Add the bottom-anchored selection sheet and verify changing selection, Close, Escape, focus handling, keyboard navigation, and small-screen keyboard behavior.
 3. Add the stateless AI endpoint, response-schema validation, prompt-injection resistance, local-reference resolution, graceful Gemini failures, and the AI disclosure.
 4. Add STEPBible-backed word study, source attribution, and tests for Greek New Testament and Hebrew Old Testament examples.
@@ -47,7 +48,7 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 
 ## Acceptance tests
 
-- A new reader reaches and reads a direct linked verse quickly on desktop and mobile; the correct translation and verse are visible.
+- A new reader can choose Holy Bible, a book, and a chapter and reach the reader; a direct linked verse opens quickly on desktop and mobile with the correct translation and verse visible.
 - KJV and WEB are aligned in comparison mode; normal mode remains a distraction-free one-translation reader.
 - Imported chapter counts, canonical book order, source metadata, checksums, and verse identifiers validate during import.
 - A selected verse opens the fixed sheet without moving the reader position; selecting a different verse updates it; closing it returns to the untouched reading view.
@@ -61,4 +62,4 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 - Firebase App Hosting deploys from `main`; preview environments are used before production rollouts.
 - Use a generated static corpus and index committed to the repository; no database stores Bible text.
 - Firestore is used only for short-lived, anonymized AI-quota counters; no Firebase Auth, user profiles, notes, or chat history are part of MVP.
-- Treat this plan as the authoritative MVP scope. Reconcile `requirements.md` before implementation so Book of Mormon is explicitly post-MVP.
+- Treat the interactive prototype as the source of truth for MVP navigation, hierarchy, and interaction behavior. Treat this plan as the source of truth for implementation architecture, security, data handling, and validation. `requirements.md` records the agreed product scope; Book of Mormon is explicitly post-MVP.
