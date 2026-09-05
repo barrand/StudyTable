@@ -8,7 +8,7 @@ Book of Mormon, notes, accounts, highlights, saved AI history, passage-range sel
 
 ## Product and reader behavior
 
-- Use Next.js App Router, TypeScript, Node 22, and Firebase App Hosting. Pin the app to an App Hosting-supported Next.js 15.2.x release and use the standard build command.
+- Use Next.js App Router, TypeScript, Node 22, and Firebase App Hosting. Implementation pins Next.js 15.5.25: the originally planned 15.2.x line has published security vulnerabilities. Use the standard build command and confirm the newer release on a Firebase preview backend before rollout; the published App Hosting support table still lists 15.2.x as active.
 - The root route starts with a scripture chooser containing one enabled option, **Holy Bible**, followed by a book chooser and chapter chooser. Choosing a chapter opens its reader route. A valid direct reader URL bypasses this onboarding flow, and returning readers may resume their locally stored last passage.
 - Reader routes are `/bible/:book/:chapter` with an optional `verse` query parameter. The selected translation and last read reference persist locally; direct links always open the stated verse.
 - At rest, show scripture with only a compact header: book navigation back arrow, centered passage title, and Settings icon. Do not show a persistent chapter subtitle, study controls, or comparison UI in the reader.

@@ -1,0 +1,124 @@
+{
+  "WEB": {
+    "edition": "World English Bible, WEBP American English, 2020 stable text edition (current eBible distribution)",
+    "url": "https://ebible.org/Scriptures/engwebp_usfm.zip",
+    "rightsUrl": "https://ebible.org/engwebp/copyright.htm",
+    "sha256": "2d2dc7b443a4cf398dfe05d1001195887c74a80b388003358ccc8a6bfc1c5c07",
+    "importedAt": "2026-09-05T03:23:48.153Z",
+    "license": "Public Domain (KJV: UK Crown rights apply)",
+    "attribution": "World English Bible · eBible.org. World English Bible is a trademark of eBible.org.",
+    "changes": "USFM formatting, notes, headings, and tags removed; scripture wording preserved. Restricted to 66 canonical books.",
+    "books": 66,
+    "chapters": 1189,
+    "verses": 31103
+  },
+  "KJV": {
+    "edition": "King James Version, standardized 1769 text; 66-book selection",
+    "url": "https://ebible.org/Scriptures/eng-kjv_usfm.zip",
+    "rightsUrl": "https://ebible.org/eng-kjv/copyright.htm",
+    "sha256": "1165788907a8bbe93c3299d89eb5134d942038e5dca2c0832beb13e8f72441d0",
+    "importedAt": "2026-09-05T03:23:51.411Z",
+    "license": "Public Domain (KJV: UK Crown rights apply)",
+    "attribution": "King James Version · CrossWire Bible Society and eBible.org.",
+    "changes": "USFM formatting, notes, headings, and tags removed; scripture wording preserved. Restricted to 66 canonical books.",
+    "books": 66,
+    "chapters": 1189,
+    "verses": 31102
+  },
+  "STEPBible": {
+    "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+    "importedAt": "2026-09-05T03:26:15.911Z",
+    "sources": [
+      {
+        "file": "Lexicons/TBESG - Translators Brief lexicon of Extended Strongs for Greek - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Lexicons/TBESG%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Greek%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "e8f58a8f841f2a338b3df648466a773928127e6080c06d32ee88694fb761facb",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Lexicons/TBESH - Translators Brief lexicon of Extended Strongs for Hebrew - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Lexicons/TBESH%20-%20Translators%20Brief%20lexicon%20of%20Extended%20Strongs%20for%20Hebrew%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "da0a8d2aafba429421f55f2906e8896a7ea83458a0d905deb2668d91f2a75e31",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Morphology codes/TEGMC - Translators Expansion of Greek Morphhology Codes - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Morphology%20codes/TEGMC%20-%20Translators%20Expansion%20of%20Greek%20Morphhology%20Codes%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "dae91653f986624e7900b774d07085cacf23e8f9f02246d0b0d88117acfb5780",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Morphology codes/TEHMC - Translators Expansion of Hebrew Morphology Codes - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Morphology%20codes/TEHMC%20-%20Translators%20Expansion%20of%20Hebrew%20Morphology%20Codes%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "b0a0cc442e6a3fce648edd0b2cc547abcaa41cacc9b16299b3b72555bb7ea796",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAGNT Act-Rev - Translators Amalgamated Greek NT - STEPBible.org CC-BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAGNT%20Act-Rev%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt",
+        "sha256": "5dcd20e5fdb9cc7907b835f4ab6f56b7a6f44a134cc7bc26b0679b8af08be5f9",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAGNT Mat-Jhn - Translators Amalgamated Greek NT - STEPBible.org CC-BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAGNT%20Mat-Jhn%20-%20Translators%20Amalgamated%20Greek%20NT%20-%20STEPBible.org%20CC-BY.txt",
+        "sha256": "973f6dbd243e9acccf529d0ac943e83142674b729ce99cbcf0e39d1e8f840733",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAHOT Gen-Deu - Translators Amalgamated Hebrew OT - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAHOT%20Gen-Deu%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "e9b8546ee48fe0bfc57c3b70f5f40e98d96580e803526d19026224e31753368b",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAHOT Isa-Mal - Translators Amalgamated Hebrew OT - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAHOT%20Isa-Mal%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "f3ded203d2a74d6368932c97ae550d1d0754b271af491dc0dedf36fe3ba0bcc5",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAHOT Job-Sng - Translators Amalgamated Hebrew OT - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAHOT%20Job-Sng%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "84e118a97e5725e3847cdfdd593873513021c790c63cc91a0d41fca2b5db2ed5",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      },
+      {
+        "file": "Translators Amalgamated OT+NT/TAHOT Jos-Est - Translators Amalgamated Hebrew OT - STEPBible.org CC BY.txt",
+        "version": "89ece29525e3c51d61850b28b4d4cf27ef9cd321",
+        "url": "https://github.com/STEPBible/STEPBible-Data/blob/89ece29525e3c51d61850b28b4d4cf27ef9cd321/Translators%20Amalgamated%20OT%2BNT/TAHOT%20Jos-Est%20-%20Translators%20Amalgamated%20Hebrew%20OT%20-%20STEPBible.org%20CC%20BY.txt",
+        "sha256": "195fee1dc3653bab33701f170734eb894ed647c10cd08cc61749375fe8b73775",
+        "license": "CC BY 4.0",
+        "attribution": "STEP Bible (www.STEPBible.org), based on work at Tyndale House Cambridge",
+        "changes": "Selected lexical fields and word occurrences normalized into chapter JSON; HTML stripped; brief definitions and occurrence lists shortened for display. Original-language text is a study aid, not a reconstructed original for either English translation."
+      }
+    ]
+  }
+}
