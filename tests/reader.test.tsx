@@ -62,3 +62,20 @@ test('follow-up questions send only passage-bound conversation tokens and reset 
   fireEvent.change(screen.getByLabelText('Ask about this passage'),{target:{value:'A different passage'}});fireEvent.click(screen.getByRole('button',{name:'Ask'}));
   await waitFor(()=>assert.equal(calls.length,3));assert.equal(calls[2].conversationToken,undefined);
 });
+
+test('study sheet follows the visual viewport when an on-screen keyboard reduces available height',async()=>{
+  const viewport=document.createElement('div');
+  Object.assign(viewport,{height:844,offsetTop:0});
+  Object.defineProperty(window,'visualViewport',{value:viewport,configurable:true});
+  const originalHeight=window.innerHeight;Object.defineProperty(window,'innerHeight',{value:844,configurable:true});
+  try {
+    render(<Reader book={books[42]} chapters={chapters}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Study John 3:16'}));
+    const sheet=screen.getByRole('complementary');assert.equal(sheet.style.getPropertyValue('--sheet-viewport'),'844px');
+    Object.assign(viewport,{height:430,offsetTop:0});fireEvent(viewport,new dom.window.Event('resize'));
+    await waitFor(()=>assert.equal(sheet.style.getPropertyValue('--keyboard-inset'),'414px'));
+    assert.equal(sheet.style.getPropertyValue('--sheet-viewport'),'430px');
+    Object.assign(viewport,{height:844});fireEvent(viewport,new dom.window.Event('resize'));
+    await waitFor(()=>assert.equal(sheet.style.getPropertyValue('--keyboard-inset'),'0px'));
+  }finally{cleanup();Object.defineProperty(window,'visualViewport',{value:undefined,configurable:true});Object.defineProperty(window,'innerHeight',{value:originalHeight,configurable:true});}
+});

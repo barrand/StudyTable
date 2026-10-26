@@ -9,7 +9,7 @@ const sdk=await ownerSdk();
 const key=(await sdk.secretManager.accessSecretVersion(PROJECT,'STUDY_GEMINI_API_KEY','latest') as string).trim();
 if(!key||key.length>512)throw new Error('Unexpected Gemini credential format.');
 const store=new MemoryStore();let calls=0;
-const model=process.env.GEMINI_MODEL??'gemini-3.8-flash';
+const model=process.env.GEMINI_MODEL??'gemini-3.1-flash-lite';
 const checks:unknown[]=[];await mkdir('.cache',{recursive:true});
 for(const input of [
   {reference:'John 3',action:'chapter-overview'},

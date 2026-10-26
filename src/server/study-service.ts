@@ -11,8 +11,8 @@ import { wordTerms } from './words';
 import { nextConversation, readConversation } from './conversation';
 
 const CORPUS_VERSION=manifest.sources.map(s=>`${s.translation}:${s.sha256}`).join('|');
-export const PROMPT_VERSION='study-2';
-export const SCHEMA_VERSION='study-1';
+export const PROMPT_VERSION='study-3';
+export const SCHEMA_VERSION='study-2';
 export function studyCacheKey(request:StudyRequest,model:string,version='1',sourceVersion=wordManifest.version) {
   return createHash('sha256').update(JSON.stringify({work:'bible',reference:request.reference,scope:request.action==='chapter-overview'?'chapter':'verse',translation:request.translation,action:request.action,language:'en',model,version,prompt:PROMPT_VERSION,schema:SCHEMA_VERSION,corpus:CORPUS_VERSION,sourceVersion})).digest('hex');
 }
@@ -32,7 +32,7 @@ export async function validateResult(raw:unknown,request:StudyRequest,terms:Word
   if(!result.summary&&!result.observations.length&&!result.interpretations.length&&!result.relatedReferences.length&&!result.cautions.length&&!result.terms?.length)throw new ServiceError(502,'The AI response was empty.');
   // Never render model-authored quotations or pretend external-source citations.
   const prose=[...result.observations,...result.interpretations,...result.cautions,result.summary,result.bookContext,result.authorshipAndAudience,result.historicalSettingAndPeople,...result.relatedReferences.map(r=>r.explanation),...(result.terms??[]).flatMap(t=>[t.contextualMeaning,t.lexicalRange])].filter(Boolean).join(' ');
-  if(/["“”«»<>]|https?:\/\/|www\./i.test(prose))throw new ServiceError(502,'The study included unsupported quotations or source markup. Please try again.');
+  if(/["“”‘«»<>]|https?:\/\/|www\./i.test(prose)||/(?:^|[\s([{])'[^'\r\n]{1,250}'(?=$|[\s.,;:!?)\]}])/u.test(prose))throw new ServiceError(502,'The study included unsupported quotations or source markup. Please try again.');
   const references=[];const seen=new Set<string>();
   for(const item of result.relatedReferences) {
     const ref=await resolveReference(item.reference,request.translation);

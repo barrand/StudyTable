@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, type CSSProperties } from 'react';
 import Link from 'next/link';
 import { TRANSLATIONS, readerUrl, referenceLabel, type Book, type Translation } from '@/lib/books';
 import type { Chapter, Verse } from '@/lib/usfm';
@@ -24,6 +24,7 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
   const [answer,setAnswer] = useState<StudyAnswer|null>(null);
   const [error,setError] = useState(''); const [loading,setLoading] = useState(false);
   const [question,setQuestion] = useState('');
+  const [visibleViewport,setVisibleViewport]=useState<{height:number;inset:number}|null>(null);
   const [conversation,setConversation] = useState<{question:string;answer:StudyAnswer}[]>([]);
   const conversationToken = useRef<string|undefined>(undefined);
   const closeButton = useRef<HTMLButtonElement>(null);
@@ -34,6 +35,23 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
   const versions: Translation[] = [primary,primary==='WEB'?'KJV':'WEB'];
   const numbers = [...new Set([...chapters.WEB.verses,...chapters.KJV.verses].flatMap(v=>Array.from({length:(v.endVerse ?? v.number)-v.number+1},(_,i)=>v.number+i)))].sort((a,b)=>a-b);
   const selectedRef = {book:book.id,chapter,...(selection?.kind==='verse'?{verse:selection.number}:{})};
+
+  useEffect(()=>{
+    const viewport=window.visualViewport;if(!viewport)return;
+    const update=()=>{
+      setVisibleViewport({height:viewport.height,inset:Math.max(0,window.innerHeight-viewport.height-viewport.offsetTop)});
+      requestAnimationFrame(()=>{
+        const active=document.activeElement;const body=sheetBody.current;
+        if(body&&active instanceof HTMLElement&&body.contains(active)) {
+          const field=active.getBoundingClientRect();const bounds=body.getBoundingClientRect();
+          if(field.bottom>bounds.bottom)body.scrollTop+=field.bottom-bounds.bottom+8;
+          else if(field.top<bounds.top)body.scrollTop-=bounds.top-field.top+8;
+        }
+      });
+    };
+    update();viewport.addEventListener('resize',update);viewport.addEventListener('scroll',update);
+    return()=>{viewport.removeEventListener('resize',update);viewport.removeEventListener('scroll',update);};
+  },[]);
 
   useEffect(()=>{
     try { const saved = localStorage.getItem('study-table:translation'); if (!initialTranslation && (saved==='WEB'||saved==='KJV')) {setPrimary(saved);setMobileVersion(saved);} } catch { /* Reading works without storage. */ }
@@ -101,7 +119,7 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
       </div>)}</div>
       <footer className="chapter-footer"><nav aria-label="Chapter navigation">{chapter>1?<Link href={readerUrl({book:book.id,chapter:chapter-1},primary)}>‹ Previous chapter</Link>:<span/>}{chapter<book.chapters&&<Link href={readerUrl({book:book.id,chapter:chapter+1},primary)}>Next chapter ›</Link>}</nav><p>{TRANSLATIONS[primary].name} · {TRANSLATIONS[primary].edition}</p><Link href="/sources">Sources & licenses</Link></footer>
     </main>
-    {selection&&<aside className="study-sheet" id="study-panel" aria-labelledby="study-heading"><div className="sheet-handle" aria-hidden="true"/><div className="sheet-title"><div><h2 id="study-heading">{selection.kind==='chapter'?'Chapter overview':'Study this verse'}</h2><p className="selected-reference">{referenceLabel(selectedRef)} · {primary}{selection.kind==='chapter'?' · Whole chapter':''}</p></div><button ref={closeButton} className="text-button" onClick={close} aria-label="Close study panel">Close</button></div>
+    {selection&&<aside className="study-sheet" id="study-panel" aria-labelledby="study-heading" style={visibleViewport?{'--sheet-viewport':`${visibleViewport.height}px`,'--keyboard-inset':`${visibleViewport.inset}px`} as CSSProperties:undefined}><div className="sheet-handle" aria-hidden="true"/><div className="sheet-title"><div><h2 id="study-heading">{selection.kind==='chapter'?'Chapter overview':'Study this verse'}</h2><p className="selected-reference">{referenceLabel(selectedRef)} · {primary}{selection.kind==='chapter'?' · Whole chapter':''}</p></div><button ref={closeButton} className="text-button" onClick={close} aria-label="Close study panel">Close</button></div>
       <div className="sheet-body" ref={sheetBody}>
         {selection.kind==='verse'&&<><details className="translations" key={`${selection.number}-${primary}`}><summary>Translations <small>KJV · WEB</small></summary><div className="translation-cards">{versions.map(v=><section className="translation-card" key={v}><h3>{v}</h3><small>{v===primary?'Reading translation · ':''}{TRANSLATIONS[v].name}</small><p><VerseText verse={verseAt(chapters[v],selection.number)} number={selection.number}/></p></section>)}</div><Link className="translation-license" href="/sources">Translation sources & attribution</Link></details>
         <div className="study-actions">{([['context','Deeper context'],['related','Related verses'],['word-study','Word study']] as const).map(([action,label])=><button key={action} onClick={()=>void requestStudy(action)} disabled={loading}>{label}</button>)}<a href={`https://biblehub.com/${book.bibleHub}/${chapter}-${selection.number}.htm`} target="_blank" rel="noreferrer">Open in Bible Hub ↗</a></div>

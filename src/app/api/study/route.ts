@@ -21,7 +21,7 @@ export async function POST(request:Request) {
     const key=process.env.GEMINI_API_KEY;const secret=process.env.RATE_LIMIT_SECRET;
     if(!key)throw new ServiceError(503,'Gemini study tools are not configured yet. Reading and translation comparison are available.');
     if(!secret||secret.length<32)throw new ServiceError(503,'AI request limits are not configured yet.');
-    const model=process.env.GEMINI_MODEL??'gemini-3.8-flash';
+    const model=process.env.GEMINI_MODEL??'gemini-3.1-flash-lite';
     const result=await study(body,clientIp(request.headers,Math.max(1,Math.min(5,Number(process.env.TRUSTED_PROXY_HOPS)||1))),{
       store:getStore(),secret,model,version:process.env.AI_CACHE_VERSION??'1',
       perKeyLimit:limit('AI_PER_KEY_DAILY_LIMIT',10),globalLimit:limit('AI_GLOBAL_DAILY_LIMIT',50),
