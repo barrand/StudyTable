@@ -39,7 +39,7 @@ Validated standard actions are cached in Firestore by passage, scope, translatio
 
 ## Firebase preview
 
-Target project: `study-table-a2869`. Preview backend: `study-table-preview` in `us-central1`. Firestore's default database is in `nam5`. Rules deny all direct client access. `firestore.indexes.json` declares TTL policies for quota, throttle, and generation-lease records; shared responses intentionally have no daily TTL. Confirm those policies are active after deployment.
+Target project: `study-table-a2869`. [Production](https://study-table--study-table-a2869.us-central1.hosted.app) uses backend `study-table`; [preview](https://study-table-preview--study-table-a2869.us-central1.hosted.app) uses `study-table-preview`, both in `us-central1`. Firestore's default database is in `nam5`. Rules deny all direct client access. Cloud TTL policies are active for quota, throttle, and generation-lease records; shared responses intentionally have no daily TTL.
 
 `apphosting.yaml` references these Secret Manager entries (runtime only):
 
@@ -56,6 +56,6 @@ The separate production backend is `study-table` in the same owner-selected proj
 
 Next.js is pinned to patched 15.5.28, with PostCSS overridden to 8.5.31, replacing the original older 15.2.x requirement. App Hosting's published active-version table still lists 15.2.x; successful preview adapter/build validation is required for the newer minor. See the [Next.js security update](https://nextjs.org/blog/nextjs-security-update-october-14-2026) and [App Hosting framework support](https://firebase.google.com/docs/app-hosting/frameworks-tooling).
 
-## Remaining acceptance work
+## Verified MVP release
 
-The goal is not complete until the full plan is verified. Remaining work includes the final same-commit preview/production rollout and browser entry-flow/accessibility checks. Live Gemini output and failure paths, a bounded live-provider cost ceiling, the deployed password gate and Gemini/Firestore cache, Firestore-adapter concurrency/TTL behavior, live proxy spoof-prefix checks, and the owner's physical-phone keyboard flow have passed. See `plans/validation.md` for evidence and limitations. Follow-up questions use signed, expiring, passage/translation-bound capsules of at most three compact turns held in browser memory; no conversation content is stored in Firestore or provider-side interaction history.
+Application commit `283b129` passed all 32 automated tests and the Node 22 production build, then the same commit passed preview and production rollouts and deployed access/cache checks. Live Gemini actions, bounded cost ceiling, private follow-ups, Firestore transactions/TTL, proxy spoof-prefix resistance, browser entry/search/comparison/URL/resume/focus behavior and the owner's physical-phone keyboard flow were checked. Runtime secrets were absent from production HTML and its ten delivered browser scripts. See `plans/completion-audit.md` for requirement-by-requirement evidence and `plans/validation.md` for operational limitations. No personal conversations are stored in Firestore or provider interaction history. Optional follow-ups include isolated projects, automatic GitHub deployments, billing alerts and a formal assistive-technology audit.

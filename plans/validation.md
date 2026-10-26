@@ -21,10 +21,14 @@
 
 CI evidence: [85fd62a verification](https://github.com/barrand/StudyTable/actions/runs/40271303815).
 
-## Remaining before production sign-off
+## Production sign-off
 
-- Roll out the exact CI-verified main commit to preview, verify it, then promote it to the separate `study-table` production backend. Both backends are in the owner-selected existing project; they intentionally share the response cache and global budget. The production backend is configured with its own origin override and the same private invite gate, but setup alone is not evidence of a production rollout.
-- Complete the remaining browser accessibility/entry-flow checks against the release. The owner's physical-phone feedback covers the verse-panel/keyboard flow, not every screen-reader interaction.
+- Exact CI-verified commit `283b129` passed preview rollout `build-2026-10-26-005`, then production rollout `build-2026-10-26-001`; both control-plane states are `SUCCEEDED`. Both deployed access/cache checks passed. Both backends are in the owner-selected existing project and intentionally share the response cache and global budget.
+- Deployed entry flow, keyboard links/disclosure, semantic AX controls, desktop comparison, literal/reference/invalid search, direct verse, translation switching, URL/resume synchronization and preserved reading position were checked. The owner's physical-phone feedback covers the verse-panel/keyboard flow; no formal screen-reader certification is claimed.
+- Production HTML and ten same-origin browser scripts contain none of the four runtime secrets or the invite password. The actual source/reader and origin/session protections passed after deployment.
+- Live related-verses, custom question and signed-context follow-up checks also passed. No custom conversation was persisted; the standard related response was reused.
 - Optional follow-up: cloud billing alerts and a second isolated project if stronger preview/production data separation becomes useful. The application generation ceiling is not a hard cap on total Firebase/GCP charges.
+
+See `plans/completion-audit.md` for the complete requirement-to-evidence mapping and exact CI/release identifiers.
 
 No claims of historical or theological authority are made by the AI validation. Scripture is local/source-backed; external scholarly retrieval is outside MVP scope.
