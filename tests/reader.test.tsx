@@ -65,7 +65,7 @@ test('follow-up questions send only passage-bound conversation tokens and reset 
 
 test('study sheet follows the visual viewport when an on-screen keyboard reduces available height',async()=>{
   const viewport=document.createElement('div');
-  Object.assign(viewport,{height:844,offsetTop:0});
+  Object.defineProperties(viewport,{height:{value:844,writable:true},offsetTop:{value:0,writable:true}});
   Object.defineProperty(window,'visualViewport',{value:viewport,configurable:true});
   const originalHeight=window.innerHeight;Object.defineProperty(window,'innerHeight',{value:844,configurable:true});
   try {

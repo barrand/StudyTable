@@ -11,7 +11,7 @@ import { wordTerms } from './words';
 import { nextConversation, readConversation } from './conversation';
 
 const CORPUS_VERSION=manifest.sources.map(s=>`${s.translation}:${s.sha256}`).join('|');
-export const PROMPT_VERSION='study-3';
+export const PROMPT_VERSION='study-4';
 export const SCHEMA_VERSION='study-2';
 export function studyCacheKey(request:StudyRequest,model:string,version='1',sourceVersion=wordManifest.version) {
   return createHash('sha256').update(JSON.stringify({work:'bible',reference:request.reference,scope:request.action==='chapter-overview'?'chapter':'verse',translation:request.translation,action:request.action,language:'en',model,version,prompt:PROMPT_VERSION,schema:SCHEMA_VERSION,corpus:CORPUS_VERSION,sourceVersion})).digest('hex');
@@ -74,7 +74,9 @@ export async function study(raw:unknown,ip:string,options:StudyOptions):Promise<
     const neighboring = request.action==='chapter-overview'
       ? await Promise.all([reference.chapter>1?loadChapter({...reference,chapter:reference.chapter-1},request.translation):null,reference.chapter<book.chapters?loadChapter({...reference,chapter:reference.chapter+1},request.translation):null]) : [];
     const bookEnds=request.action==='chapter-overview'?await Promise.all([loadChapter({...reference,chapter:1},request.translation),loadChapter({...reference,chapter:book.chapters},request.translation)]):[];
-    const context={book:{name:book.name,testament:book.testament,chapters:book.chapters},chapter,neighboringChapters:neighboring.filter(Boolean),bookOpeningAndClosing:bookEnds.map(c=>({...c,verses:c.verses.slice(0,12)})),...(terms.length?{sourceTerms:terms}:{}),...(conversation.length?{priorConversation:conversation}:{})};
+    const alternate=request.action==='word-study'?await loadChapter(reference,request.translation==='WEB'?'KJV':'WEB'):null;
+    const comparison=alternate?[chapter,alternate].map((c,index)=>({translation:index===0?request.translation:request.translation==='WEB'?'KJV':'WEB',verse:c.verses.find(v=>v.number<=reference.verse!&&(v.endVerse??v.number)>=reference.verse!)})):undefined;
+    const context={book:{name:book.name,testament:book.testament,chapters:book.chapters},chapter,neighboringChapters:neighboring.filter(Boolean),bookOpeningAndClosing:bookEnds.map(c=>({...c,verses:c.verses.slice(0,12)})),...(terms.length?{sourceTerms:terms,translationComparison:comparison}:{}),...(conversation.length?{priorConversation:conversation}:{})};
     const remaining=await reserveQuota(options.store,ip,options.secret,options.perKeyLimit??10,options.globalLimit??50,now());
     const result=await validateResult(await options.generate(request,context),request,terms);
     const generatedAt=new Date(now()).toISOString();

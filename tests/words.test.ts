@@ -28,6 +28,8 @@ test('word-study generation is grounded in that verse’s terms and cannot retur
   let grounded:WordTerm[]=[];
   const config={store:new MemoryStore(),secret:'s'.repeat(40),model:'test-gemini',generate:async(_input:unknown,context:unknown)=>{
     grounded=(context as {sourceTerms:WordTerm[]}).sourceTerms;
+    const comparison=(context as {translationComparison:{translation:string;verse:{text:string}}[]}).translationComparison;
+    assert.deepEqual(comparison.map(c=>c.translation),['WEB','KJV']);assert(comparison.every(c=>c.verse.text.includes('created')));
     return {observations:['The verse introduces creation.'],interpretations:[],relatedReferences:[],cautions:['Observed glosses are not a complete lexical definition.'],terms:[{id:grounded[0].id,contextualMeaning:'Beginning in the context of this verse.',lexicalRange:'The bundled tags attest beginning and first; they do not supply a full lexical definition.'}]};
   }};
   const answer=await study(request,'a',config);assert.equal(answer.terms!.length,1);assert.equal(answer.terms![0].id,grounded[0].id);

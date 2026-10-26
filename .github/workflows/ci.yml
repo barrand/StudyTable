@@ -18,6 +18,13 @@ jobs:
       - run: npm run verify:corpus
       - run: npm run verify:words
       - run: npm test
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - run: npx --yes firebase-tools@15.32.1 emulators:exec --only firestore --project demo-study-table --config firebase.emulator.json "npx tsx --test tests/firestore.integration.ts"
+        env:
+          GOOGLE_CLOUD_PROJECT: demo-study-table
       - run: npm run typecheck
       - run: npm audit --omit=dev
       - run: npm run build

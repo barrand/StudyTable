@@ -19,7 +19,7 @@ npm audit --omit=dev
 npm run build
 ```
 
-Tests cover real corpus references and literal search, USFM styles/notes/omissions, prototype and React reader interactions, stale requests, password/session handling, concurrent quotas and cache leases, Gemini request shaping, original-language source terms, and malformed output. CI runs these checks on Node 22. These checks do not replace the live Gemini, actual Firestore, production-access, mobile keyboard, and deployed-preview checks in the MVP plan.
+Tests cover real corpus references and literal search, USFM styles/notes/omissions, prototype and React reader interactions, stale requests, password/session handling, concurrent quotas and cache leases, Gemini request shaping, original-language source terms, and malformed output. CI runs these checks on Node 22, plus two integration tests against the real Firestore adapter in the local emulator (Java 21). Run the latter with `GOOGLE_CLOUD_PROJECT=demo-study-table` and `firebase emulators:exec --only firestore --project demo-study-table --config firebase.emulator.json "npx tsx --test tests/firestore.integration.ts"`. The tests refuse to run against a cloud database.
 
 ## Bundled sources
 
@@ -30,6 +30,8 @@ All 66 canonical books in both translations are committed as per-chapter JSON. D
 ## AI behavior and caching
 
 `POST /api/study` requires an access session and same-origin request. It validates the reference/action scope and loads scripture from the server's local corpus. Gemini Interactions requests use `store: false`, a JSON response schema, no tools/web grounding, and no previous interaction ID. Output is validated and rendered as text, with links resolved against the local corpus. External scholarly citations are not included.
+
+The tested default is `gemini-3.1-flash-lite`, configurable through `GEMINI_MODEL`. Live validation on 2026-10-26 passed chapter overviews, verse context, and Greek/Hebrew word study. Newer Flash models returned capacity errors during this project's validation; there is no automatic model fallback or unbounded retry. Chapter overview schemas require all four context sections. Word studies receive both exact KJV/WEB verses for comparison alongside the source-language tags.
 
 Validated standard actions are cached in Firestore by passage, scope, translation/corpus, action, model, prompt/schema/source versions, language, and `AI_CACHE_VERSION`. Cache hits are available even when generation quotas are exhausted. A transaction lease prevents simultaneous misses from generating the same response twice. Generation attempts count toward atomic per-IP/day and global/day budgets, defaulting to 10 and 50. Failed or invalid responses are not cached. Increment `AI_CACHE_VERSION` to invalidate reusable content without deleting old records. There is no public regenerate endpoint.
 
@@ -54,4 +56,4 @@ Next.js is pinned to patched 15.5.28, with PostCSS overridden to 8.5.31, replaci
 
 ## Remaining acceptance work
 
-The goal is not complete until the full plan is verified. Remaining work includes live Gemini output/quality and failure checks, actual Firestore cache/quota/TTL verification, the private deployed preview and cost ceiling, production rollout, and mobile/browser accessibility checks. Follow-up questions use signed, expiring, passage/translation-bound capsules of at most three compact turns held in browser memory; no conversation content is stored in Firestore or provider-side interaction history.
+The goal is not complete until the full plan is verified. Remaining work includes the final deployed Gemini/cache check, production rollout, actual proxy-chain validation, and a physical-phone keyboard/accessibility pass. Live Gemini output and failure paths, the deployed password gate, Firestore-adapter concurrent quota/cache/TTL behavior, and desktop/narrow-height reader checks have passed. The emulator verifies cost ceilings without spending a visitor's deployed daily allowance. Follow-up questions use signed, expiring, passage/translation-bound capsules of at most three compact turns held in browser memory; no conversation content is stored in Firestore or provider-side interaction history.
