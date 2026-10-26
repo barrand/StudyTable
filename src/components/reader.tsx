@@ -24,6 +24,8 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
   const [answer,setAnswer] = useState<StudyAnswer|null>(null);
   const [error,setError] = useState(''); const [loading,setLoading] = useState(false);
   const [question,setQuestion] = useState('');
+  const [conversation,setConversation] = useState<{question:string;answer:StudyAnswer}[]>([]);
+  const conversationToken = useRef<string|undefined>(undefined);
   const closeButton = useRef<HTMLButtonElement>(null);
   const lastTrigger = useRef<HTMLElement|null>(null);
   const pending = useRef<AbortController|null>(null);
@@ -47,7 +49,7 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
   function close() { epoch.current++;pending.current?.abort();setSelection(null);setLoading(false);lastTrigger.current?.focus({preventScroll:true}); }
   function select(next: Selection, trigger: HTMLElement) {
     epoch.current++; pending.current?.abort();lastTrigger.current=trigger;
-    setAnswer(null);setError('');setQuestion('');setLoading(false);setSelection(next);setSettings(false);
+    setAnswer(null);setError('');setQuestion('');setLoading(false);setSelection(next);setSettings(false);setConversation([]);conversationToken.current=undefined;
   }
   useEffect(()=>{
     if (!selection) return;
@@ -62,10 +64,14 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
     if (!selection) return;
     pending.current?.abort();const controller=new AbortController();pending.current=controller;
     const requestEpoch=epoch.current;
-    const input={reference:referenceLabel(selectedRef),translation:primary,action,...(customQuestion?{question:customQuestion.trim()}:{})};
+    const input={reference:referenceLabel(selectedRef),translation:primary,action,...(customQuestion?{question:customQuestion.trim(),...(conversationToken.current?{conversationToken:conversationToken.current}:{})}:{})};
     const key=JSON.stringify(input);
     setError('');setAnswer(null);
-    if(action==='ask' && questionCache.has(key)){setAnswer(questionCache.get(key)!);setLoading(false);return;}
+    function accept(value:StudyAnswer) {
+      if(action==='ask') {setConversation(previous=>[...previous,{question:customQuestion!.trim(),answer:value}].slice(-3));conversationToken.current=value.conversationToken;setQuestion('');setAnswer(null);}
+      else setAnswer(value);
+    }
+    if(action==='ask' && questionCache.has(key)){accept(questionCache.get(key)!);setLoading(false);return;}
     setLoading(true);
     try {
       const response=await fetch('/api/study',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(input),signal:controller.signal});
@@ -76,12 +82,12 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
       const validated={...data,result} as StudyAnswer;
       if(controller.signal.aborted||requestEpoch!==epoch.current)return;
       if(action==='ask'){if(questionCache.size>=40)questionCache.delete(questionCache.keys().next().value!);questionCache.set(key,validated);}
-      setAnswer(validated);
+      accept(validated);
     } catch(caught) {
       if(!controller.signal.aborted&&requestEpoch===epoch.current)setError(caught instanceof Error?caught.message:'Study guidance is unavailable.');
     } finally {if(!controller.signal.aborted&&requestEpoch===epoch.current)setLoading(false);}
   }
-  function changePrimary(value:Translation) {pending.current?.abort();epoch.current++;setSelection(null);setAnswer(null);setPrimary(value);setMobileVersion(value);}
+  function changePrimary(value:Translation) {pending.current?.abort();epoch.current++;setSelection(null);setAnswer(null);setConversation([]);conversationToken.current=undefined;setPrimary(value);setMobileVersion(value);}
   return <>
     <header className="topbar reader-header"><Link className="icon-button" href={`/bible/${book.slug}`} aria-label={`Choose a chapter in ${book.name}`}>‹</Link><span className="brand">{book.name} {chapter}</span><button className="icon-button" aria-label="Settings" aria-expanded={settings} aria-controls="reader-settings" onClick={()=>setSettings(!settings)}>⚙</button>
       {settings&&<section className="settings" id="reader-settings" aria-label="Reader settings"><label htmlFor="primary">Reading translation</label><select id="primary" value={primary} onChange={event=>changePrimary(event.target.value as Translation)}><option value="WEB">World English Bible</option><option value="KJV">King James Version</option></select><label className="checkbox"><input type="checkbox" checked={compare} onChange={event=>setCompare(event.target.checked)}/> Compare the chapter</label><Link href="/search">Find a passage</Link><Link href="/sources">Sources & licenses</Link><small>AI allowance applies to new generations. Saved standard answers are reused.</small><button className="text-button" onClick={()=>setSettings(false)}>Close settings</button></section>}
@@ -99,12 +105,13 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
       <div className="sheet-body" ref={sheetBody}>
         {selection.kind==='verse'&&<><details className="translations" key={`${selection.number}-${primary}`}><summary>Translations <small>KJV · WEB</small></summary><div className="translation-cards">{versions.map(v=><section className="translation-card" key={v}><h3>{v}</h3><small>{v===primary?'Reading translation · ':''}{TRANSLATIONS[v].name}</small><p><VerseText verse={verseAt(chapters[v],selection.number)} number={selection.number}/></p></section>)}</div><Link className="translation-license" href="/sources">Translation sources & attribution</Link></details>
         <div className="study-actions">{([['context','Deeper context'],['related','Related verses'],['word-study','Word study']] as const).map(([action,label])=><button key={action} onClick={()=>void requestStudy(action)} disabled={loading}>{label}</button>)}<a href={`https://biblehub.com/${book.bibleHub}/${chapter}-${selection.number}.htm`} target="_blank" rel="noreferrer">Open in Bible Hub ↗</a></div>
-        <form onSubmit={event=>{event.preventDefault();if(question.trim())void requestStudy('ask',question);}}><label htmlFor="study-question">Ask about this passage</label><div className="form-row"><input id="study-question" value={question} onChange={event=>setQuestion(event.target.value)} maxLength={500} placeholder="What does this mean?" required/><button disabled={loading||!question.trim()}>Ask</button></div></form></>}
+        <form onSubmit={event=>{event.preventDefault();if(question.trim())void requestStudy('ask',question);}}><label htmlFor="study-question">{conversation.length?'Ask a follow-up about this passage':'Ask about this passage'}</label><div className="form-row"><input id="study-question" value={question} onChange={event=>setQuestion(event.target.value)} maxLength={500} placeholder="What does this mean?" required/><button disabled={loading||!question.trim()}>Ask</button></div>{conversation.length>0&&<button type="button" className="text-button" onClick={()=>{pending.current?.abort();epoch.current++;setLoading(false);setConversation([]);conversationToken.current=undefined;setAnswer(null);setError('');}}>Start a new conversation</button>}</form></>}
         <div className="study-response" aria-live="polite" aria-busy={loading}>
+          {conversation.map((turn,index)=><section className="conversation-turn" key={index}><h3>Your question</h3><p>{turn.question}</p><AnswerView answer={turn.answer} translation={primary}/></section>)}
           {loading&&<p className="muted">Finding study guidance…</p>}
           {error&&<div role="alert"><p>{error}</p>{selection.kind==='chapter'&&<button onClick={()=>void requestStudy('chapter-overview')}>Try again</button>}</div>}
           {answer&&<AnswerView answer={answer} translation={primary}/>}
-          {!answer&&!loading&&!error&&<p className="muted">Expand Translations, choose a study action, or ask a question about this verse.</p>}
+          {!answer&&!loading&&!error&&!conversation.length&&<p className="muted">Expand Translations, choose a study action, or ask a question about this verse.</p>}
         </div>
         <p className="disclaimer">AI-generated study guidance · Google Gemini. AI may be incomplete or mistaken. Check references and reliable sources. External scholarly citations are not included.</p>
       </div>

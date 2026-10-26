@@ -50,3 +50,15 @@ test('reading translation is restored locally; direct-link translation takes pre
   fireEvent.click(screen.getByRole('button',{name:'Study John 3:16'}));
   assert.equal(screen.getByText('Translations').closest('details')!.querySelector('h3')!.textContent,'WEB');
 });
+test('follow-up questions send only passage-bound conversation tokens and reset on verse change',async()=>{
+  const calls:Record<string,unknown>[]=[];
+  globalThis.fetch=async(_url,init)=>{const input=JSON.parse(String(init?.body));calls.push(input);return Response.json({...answer,reference:input.reference,action:'ask',conversationToken:'signed-test-context',result:{observations:['An answer about the selected verse.'],interpretations:[],relatedReferences:[],cautions:[]}});};
+  render(<Reader book={books[42]} chapters={chapters}/>);fireEvent.click(screen.getByRole('button',{name:'Study John 3:16'}));
+  fireEvent.change(screen.getByLabelText('Ask about this passage'),{target:{value:'First question'}});fireEvent.click(screen.getByRole('button',{name:'Ask'}));
+  await screen.findByLabelText('Ask a follow-up about this passage');
+  fireEvent.change(screen.getByLabelText('Ask a follow-up about this passage'),{target:{value:'Explain your first point'}});fireEvent.click(screen.getByRole('button',{name:'Ask'}));
+  await waitFor(()=>assert.equal(calls.length,2));assert.equal(calls[1].conversationToken,'signed-test-context');
+  fireEvent.click(screen.getByRole('button',{name:'Study John 3:17'}));assert.equal(screen.queryByText('First question'),null);
+  fireEvent.change(screen.getByLabelText('Ask about this passage'),{target:{value:'A different passage'}});fireEvent.click(screen.getByRole('button',{name:'Ask'}));
+  await waitFor(()=>assert.equal(calls.length,3));assert.equal(calls[2].conversationToken,undefined);
+});

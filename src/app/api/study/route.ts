@@ -17,7 +17,7 @@ export async function POST(request:Request) {
     if(!await hasSession())throw new ServiceError(401,'Enter the invite password before using study tools.');
     checkOrigin(request);
     if(!request.headers.get('content-type')?.startsWith('application/json'))throw new ServiceError(415,'Expected a JSON study request.');
-    let body:unknown;try{body=JSON.parse(await boundedText(request));}catch(error){if(error instanceof ServiceError)throw error;throw new ServiceError(400,'The study request is not valid JSON.');}
+    let body:unknown;try{body=JSON.parse(await boundedText(request,20000));}catch(error){if(error instanceof ServiceError)throw error;throw new ServiceError(400,'The study request is not valid JSON.');}
     const key=process.env.GEMINI_API_KEY;const secret=process.env.RATE_LIMIT_SECRET;
     if(!key)throw new ServiceError(503,'Gemini study tools are not configured yet. Reading and translation comparison are available.');
     if(!secret||secret.length<32)throw new ServiceError(503,'AI request limits are not configured yet.');

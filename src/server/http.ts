@@ -6,8 +6,9 @@ export async function boundedText(request:Request,maxBytes=4096) {
   try {while(true){const {done,value}=await reader.read();if(done)break;size+=value.byteLength;if(size>maxBytes){await reader.cancel();throw new ServiceError(413,'Request is too large.');}chunks.push(value);}}finally{reader.releaseLock();}
   return Buffer.concat(chunks).toString('utf8');
 }
+export function publicOrigin(request:Request) {return new URL(process.env.APP_ORIGIN??request.url).origin;}
 export function checkOrigin(request:Request) {
-  if(request.headers.get('origin')!==new URL(request.url).origin)throw new ServiceError(403,'This request must come from Study Table.');
+  if(request.headers.get('origin')!==publicOrigin(request))throw new ServiceError(403,'This request must come from Study Table.');
 }
 export function errorResponse(error:unknown) {
   const known=error instanceof ServiceError;

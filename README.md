@@ -54,4 +54,4 @@ Next.js is pinned to patched 15.5.28, with PostCSS overridden to 8.5.31, replaci
 
 ## Remaining acceptance work
 
-The goal is not complete until the full plan is verified. Remaining work includes live Gemini output/quality and failure checks, actual Firestore cache/quota/TTL verification, the private deployed preview and cost ceiling, production rollout, mobile/browser accessibility checks, and confirming follow-up questions meet the requested passage-scoped conversation behavior. The current server handles each custom question independently; this limitation must be resolved before MVP completion.
+The goal is not complete until the full plan is verified. Remaining work includes live Gemini output/quality and failure checks, actual Firestore cache/quota/TTL verification, the private deployed preview and cost ceiling, production rollout, and mobile/browser accessibility checks. Follow-up questions use signed, expiring, passage/translation-bound capsules of at most three compact turns held in browser memory; no conversation content is stored in Firestore or provider-side interaction history.

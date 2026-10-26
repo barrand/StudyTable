@@ -8,6 +8,7 @@ import { ServiceError } from './errors';
 import { reserveQuota, throttle } from './limits';
 import type { Store } from './store';
 import { wordTerms } from './words';
+import { nextConversation, readConversation } from './conversation';
 
 const CORPUS_VERSION=manifest.sources.map(s=>`${s.translation}:${s.sha256}`).join('|');
 export const PROMPT_VERSION='study-2';
@@ -47,6 +48,7 @@ export async function study(raw:unknown,ip:string,options:StudyOptions):Promise<
   if(!reference||(request.action==='chapter-overview')!==(reference.verse===undefined))throw new ServiceError(400,'The reference must be a chapter for overview, or a single valid verse for verse study.');
   request.reference=referenceLabel(reference);
   const now=options.now??Date.now;const version=options.version??'1';
+  const conversation=request.action==='ask'?readConversation(request.conversationToken,request.reference,request.translation,options.secret,now()):[];
   await throttle(options.store,ip,options.secret,'study',30,60000,now());
   const terms=request.action==='word-study'?await (options.getTerms??wordTerms)(reference,request.translation):[];
   const cacheKey=`studyResponses/${studyCacheKey(request,options.model,version,options.sourceVersion)}`;
@@ -72,7 +74,7 @@ export async function study(raw:unknown,ip:string,options:StudyOptions):Promise<
     const neighboring = request.action==='chapter-overview'
       ? await Promise.all([reference.chapter>1?loadChapter({...reference,chapter:reference.chapter-1},request.translation):null,reference.chapter<book.chapters?loadChapter({...reference,chapter:reference.chapter+1},request.translation):null]) : [];
     const bookEnds=request.action==='chapter-overview'?await Promise.all([loadChapter({...reference,chapter:1},request.translation),loadChapter({...reference,chapter:book.chapters},request.translation)]):[];
-    const context={book:{name:book.name,testament:book.testament,chapters:book.chapters},chapter,neighboringChapters:neighboring.filter(Boolean),bookOpeningAndClosing:bookEnds.map(c=>({...c,verses:c.verses.slice(0,12)})),...(terms.length?{sourceTerms:terms}:{})};
+    const context={book:{name:book.name,testament:book.testament,chapters:book.chapters},chapter,neighboringChapters:neighboring.filter(Boolean),bookOpeningAndClosing:bookEnds.map(c=>({...c,verses:c.verses.slice(0,12)})),...(terms.length?{sourceTerms:terms}:{}),...(conversation.length?{priorConversation:conversation}:{})};
     const remaining=await reserveQuota(options.store,ip,options.secret,options.perKeyLimit??10,options.globalLimit??50,now());
     const result=await validateResult(await options.generate(request,context),request,terms);
     const generatedAt=new Date(now()).toISOString();
@@ -80,7 +82,7 @@ export async function study(raw:unknown,ip:string,options:StudyOptions):Promise<
       const lease=await tx.get(leaseKey);if(lease?.owner!==owner)throw new ServiceError(425,'The study generation expired. Please try again.',2);
       tx.set(cacheKey,{result,generatedAt,model:options.model,cacheVersion:version,sourceVersion:options.sourceVersion??wordManifest.version});
     });
-    return {result,reference:request.reference,translation:request.translation,action:request.action,cached:false,generatedAt,model:options.model,cacheVersion:version,remaining,...(terms.length?{terms:terms.filter(t=>result.terms?.some(term=>term.id===t.id))}:{})};
+    return {result,reference:request.reference,translation:request.translation,action:request.action,cached:false,generatedAt,model:options.model,cacheVersion:version,remaining,...(terms.length?{terms:terms.filter(t=>result.terms?.some(term=>term.id===t.id))}:{}),...(request.action==='ask'?{conversationToken:nextConversation(request.reference,request.translation,conversation,request.question!,result,options.secret,now())}:{})};
   } finally {
     if(request.action!=='ask')await options.store.transaction(async tx=>{const lease=await tx.get(leaseKey);if(lease?.owner===owner)tx.delete(leaseKey);});
   }
