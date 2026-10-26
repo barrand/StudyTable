@@ -1,0 +1,10 @@
+{
+  "indexes": [],
+  "fieldOverrides": [
+    { "collectionGroup": "generationQuotas", "fieldPath": "expireAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "generationTotals", "fieldPath": "expireAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "generationLeases", "fieldPath": "expireAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "requestLimits", "fieldPath": "expireAt", "ttl": true, "indexes": [] },
+    { "collectionGroup": "studyResponses", "fieldPath": "result", "indexes": [] }
+  ]
+}

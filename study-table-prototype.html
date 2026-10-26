@@ -1085,6 +1085,19 @@ html&gt;body{padding:0}&lt;/style&gt;
   #study-table-mockup .st-compare-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
   #study-table-mockup .st-translation-card { background: var(--st-surface); border: 1px solid var(--st-border); padding: 13px; border-radius: 8px; font-size: 15px; line-height: 1.5; }
   #study-table-mockup .st-translation-card strong { display: block; color: var(--st-accent); font: 500 12px system-ui, sans-serif; margin-bottom: 7px; letter-spacing: .07em; }
+  #study-table-mockup .st-translation-card small { display: block; color: var(--st-muted); font: 11px/1.5 system-ui, sans-serif; margin-bottom: 8px; }
+  #study-table-mockup .st-translation-card p { margin: 0; }
+  #study-table-mockup .st-chapter-tools { display: flex; justify-content: flex-end; margin: 0 0 18px; }
+  #study-table-mockup .st-overview-button { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 8px 12px; border: 1px solid var(--st-border); border-radius: 999px; background: var(--st-surface); color: var(--st-accent); font: 13px system-ui, sans-serif; cursor: pointer; }
+  #study-table-mockup .st-overview-button:hover, #study-table-mockup .st-overview-button[aria-expanded=&quot;true&quot;] { background: var(--st-surface-2); border-color: var(--st-accent); }
+  #study-table-mockup .st-overview-button small { color: var(--st-muted); font-size: 10px; border-left: 1px solid var(--st-border); padding-left: 8px; }
+  #study-table-mockup .st-translations { margin-bottom: 16px; border: 1px solid var(--st-border); border-radius: 8px; background: var(--st-surface-2); }
+  #study-table-mockup .st-translations summary { cursor: pointer; padding: 12px; color: var(--st-text); font: 13px system-ui, sans-serif; }
+  #study-table-mockup .st-translations summary small { color: var(--st-muted); font-size: 11px; margin-left: 8px; }
+  #study-table-mockup .st-translations .st-compare-grid { padding: 0 12px 12px; }
+  #study-table-mockup .st-response h3 { margin: 18px 0 6px; color: var(--st-accent); font: 400 17px/1.3 Georgia, serif; }
+  #study-table-mockup .st-response h3:first-child { margin-top: 0; }
+  #study-table-mockup .st-preview-label { color: var(--st-muted); font: 11px/1.5 system-ui, sans-serif; margin: 10px 0 0; }
   #study-table-mockup .st-study { border-left: 1px solid var(--st-border); background: #141b16; padding: 20px 16px; font-family: system-ui, sans-serif; }
   #study-table-mockup .st-study h2 { font: 500 17px Georgia, serif; margin: 0 0 6px; }
   #study-table-mockup .st-selected { color: var(--st-accent); font-size: 13px; margin-bottom: 16px; }
@@ -1153,7 +1166,7 @@ html&gt;body{padding:0}&lt;/style&gt;
     #study-table-mockup .st-reader { padding: 20px 14px; }
     #study-table-mockup .st-reader-top { display: block; text-align: center; }
     #study-table-mockup .st-verse { font-size: 18px; line-height: 1.75; padding: 8px 7px; }
-    #study-table-mockup .st-study { bottom: 0; width: 100%; max-height: 55vh; border-radius: 14px 14px 0 0; border-bottom: 0; padding-bottom: 20px; }
+    #study-table-mockup .st-study { bottom: 0; width: 100%; max-height: 55vh; border-radius: 14px 14px 0 0; border-bottom: 0; padding-bottom: max(20px, env(safe-area-inset-bottom)); }
     #study-table-mockup .st-sheet-handle { display: block; }
     #study-table-mockup .st-app.has-selection .st-reader { padding-bottom: 400px; }
     #study-table-mockup .st-compare-grid { grid-template-columns: 1fr; }
@@ -1190,15 +1203,17 @@ html&gt;body{padding:0}&lt;/style&gt;
     &lt;/section&gt;
     &lt;div class=&quot;st-main&quot; id=&quot;st-reader-screen&quot; hidden&gt;
       &lt;section class=&quot;st-reader&quot; aria-label=&quot;Scripture reader&quot;&gt;
+        &lt;div class=&quot;st-chapter-tools&quot;&gt;&lt;button class=&quot;st-overview-button&quot; id=&quot;st-chapter-overview&quot; type=&quot;button&quot; aria-controls=&quot;st-study-panel&quot; aria-expanded=&quot;false&quot;&gt;&lt;span aria-hidden=&quot;true&quot;&gt;✦&lt;/span&gt; Chapter overview &lt;small&gt;AI&lt;/small&gt;&lt;/button&gt;&lt;/div&gt;
         &lt;div id=&quot;st-verses&quot;&gt;&lt;/div&gt;
-        &lt;section class=&quot;st-compare&quot; id=&quot;st-compare&quot; aria-label=&quot;Translation comparison&quot;&gt;
-          &lt;div class=&quot;st-compare-head&quot;&gt;&lt;h2&gt;Compare selected verse&lt;/h2&gt;&lt;select id=&quot;st-compare-select&quot; aria-label=&quot;Select comparison translation&quot;&gt;&lt;option value=&quot;KJV&quot;&gt;KJV&lt;/option&gt;&lt;option value=&quot;WEB&quot;&gt;WEB&lt;/option&gt;&lt;/select&gt;&lt;/div&gt;
-          &lt;div class=&quot;st-compare-grid&quot; id=&quot;st-compare-grid&quot;&gt;&lt;/div&gt;
-        &lt;/section&gt;
       &lt;/section&gt;
-      &lt;aside class=&quot;st-study&quot; aria-label=&quot;Inline AI study panel&quot;&gt;
+      &lt;aside class=&quot;st-study&quot; id=&quot;st-study-panel&quot; aria-labelledby=&quot;st-study-heading&quot;&gt;
         &lt;div class=&quot;st-sheet-handle&quot; aria-hidden=&quot;true&quot;&gt;&lt;/div&gt;
-        &lt;div class=&quot;st-study-title&quot;&gt;&lt;div&gt;&lt;h2&gt;Study this passage&lt;/h2&gt;&lt;div class=&quot;st-selected&quot; id=&quot;st-selected&quot;&gt;John 3:16 · WEB&lt;/div&gt;&lt;/div&gt;&lt;button class=&quot;st-close&quot; id=&quot;st-close&quot; type=&quot;button&quot; aria-label=&quot;Close study panel&quot;&gt;Close&lt;/button&gt;&lt;/div&gt;
+        &lt;div class=&quot;st-study-title&quot;&gt;&lt;div&gt;&lt;h2 id=&quot;st-study-heading&quot;&gt;Study this verse&lt;/h2&gt;&lt;div class=&quot;st-selected&quot; id=&quot;st-selected&quot;&gt;John 3:16 · WEB&lt;/div&gt;&lt;/div&gt;&lt;button class=&quot;st-close&quot; id=&quot;st-close&quot; type=&quot;button&quot; aria-label=&quot;Close study panel&quot;&gt;Close&lt;/button&gt;&lt;/div&gt;
+        &lt;details class=&quot;st-translations&quot; id=&quot;st-verse-translations&quot;&gt;
+          &lt;summary&gt;Translations &lt;small&gt;KJV · WEB&lt;/small&gt;&lt;/summary&gt;
+          &lt;div class=&quot;st-compare-grid&quot; id=&quot;st-compare-grid&quot;&gt;&lt;/div&gt;
+        &lt;/details&gt;
+        &lt;div id=&quot;st-verse-tools&quot;&gt;
         &lt;div class=&quot;st-actions&quot;&gt;
           &lt;button class=&quot;st-action&quot; type=&quot;button&quot; data-answer=&quot;context&quot;&gt;Deeper context&lt;/button&gt;
           &lt;button class=&quot;st-action&quot; type=&quot;button&quot; data-answer=&quot;related&quot;&gt;Related verses&lt;/button&gt;
@@ -1207,6 +1222,8 @@ html&gt;body{padding:0}&lt;/style&gt;
         &lt;/div&gt;
         &lt;label class=&quot;st-meta&quot; for=&quot;st-question&quot;&gt;Ask about this passage&lt;/label&gt;
         &lt;div class=&quot;st-question&quot;&gt;&lt;input id=&quot;st-question&quot; placeholder=&quot;What does this mean?&quot; /&gt;&lt;button class=&quot;st-send&quot; id=&quot;st-send&quot; type=&quot;button&quot;&gt;Ask&lt;/button&gt;&lt;/div&gt;
+        &lt;/div&gt;
+        &lt;p class=&quot;st-preview-label&quot;&gt;Prototype sample · AI responses will use Google Gemini&lt;/p&gt;
         &lt;div class=&quot;st-response&quot; id=&quot;st-response&quot; aria-live=&quot;polite&quot;&gt;&lt;p&gt;Select a verse, then choose a study prompt or ask your own question.&lt;/p&gt;&lt;/div&gt;
         &lt;div class=&quot;st-disclaimer&quot;&gt;AI is a study aid. Check references and explore trusted sources.&lt;/div&gt;
       &lt;/aside&gt;
@@ -1289,19 +1306,139 @@ html&gt;body{padding:0}&lt;/style&gt;
     [&#x27;Genesis&#x27;,50,&#x27;Old Testament&#x27;],[&#x27;Exodus&#x27;,40,&#x27;Old Testament&#x27;],[&#x27;Leviticus&#x27;,27,&#x27;Old Testament&#x27;],[&#x27;Numbers&#x27;,36,&#x27;Old Testament&#x27;],[&#x27;Deuteronomy&#x27;,34,&#x27;Old Testament&#x27;],[&#x27;Joshua&#x27;,24,&#x27;Old Testament&#x27;],[&#x27;Judges&#x27;,21,&#x27;Old Testament&#x27;],[&#x27;Ruth&#x27;,4,&#x27;Old Testament&#x27;],[&#x27;1 Samuel&#x27;,31,&#x27;Old Testament&#x27;],[&#x27;2 Samuel&#x27;,24,&#x27;Old Testament&#x27;],[&#x27;1 Kings&#x27;,22,&#x27;Old Testament&#x27;],[&#x27;2 Kings&#x27;,25,&#x27;Old Testament&#x27;],[&#x27;1 Chronicles&#x27;,29,&#x27;Old Testament&#x27;],[&#x27;2 Chronicles&#x27;,36,&#x27;Old Testament&#x27;],[&#x27;Ezra&#x27;,10,&#x27;Old Testament&#x27;],[&#x27;Nehemiah&#x27;,13,&#x27;Old Testament&#x27;],[&#x27;Esther&#x27;,10,&#x27;Old Testament&#x27;],[&#x27;Job&#x27;,42,&#x27;Old Testament&#x27;],[&#x27;Psalms&#x27;,150,&#x27;Old Testament&#x27;],[&#x27;Proverbs&#x27;,31,&#x27;Old Testament&#x27;],[&#x27;Ecclesiastes&#x27;,12,&#x27;Old Testament&#x27;],[&#x27;Song of Solomon&#x27;,8,&#x27;Old Testament&#x27;],[&#x27;Isaiah&#x27;,66,&#x27;Old Testament&#x27;],[&#x27;Jeremiah&#x27;,52,&#x27;Old Testament&#x27;],[&#x27;Lamentations&#x27;,5,&#x27;Old Testament&#x27;],[&#x27;Ezekiel&#x27;,48,&#x27;Old Testament&#x27;],[&#x27;Daniel&#x27;,12,&#x27;Old Testament&#x27;],[&#x27;Hosea&#x27;,14,&#x27;Old Testament&#x27;],[&#x27;Joel&#x27;,3,&#x27;Old Testament&#x27;],[&#x27;Amos&#x27;,9,&#x27;Old Testament&#x27;],[&#x27;Obadiah&#x27;,1,&#x27;Old Testament&#x27;],[&#x27;Jonah&#x27;,4,&#x27;Old Testament&#x27;],[&#x27;Micah&#x27;,7,&#x27;Old Testament&#x27;],[&#x27;Nahum&#x27;,3,&#x27;Old Testament&#x27;],[&#x27;Habakkuk&#x27;,3,&#x27;Old Testament&#x27;],[&#x27;Zephaniah&#x27;,3,&#x27;Old Testament&#x27;],[&#x27;Haggai&#x27;,2,&#x27;Old Testament&#x27;],[&#x27;Zechariah&#x27;,14,&#x27;Old Testament&#x27;],[&#x27;Malachi&#x27;,4,&#x27;Old Testament&#x27;],
     [&#x27;Matthew&#x27;,28,&#x27;New Testament&#x27;],[&#x27;Mark&#x27;,16,&#x27;New Testament&#x27;],[&#x27;Luke&#x27;,24,&#x27;New Testament&#x27;],[&#x27;John&#x27;,21,&#x27;New Testament&#x27;],[&#x27;Acts&#x27;,28,&#x27;New Testament&#x27;],[&#x27;Romans&#x27;,16,&#x27;New Testament&#x27;],[&#x27;1 Corinthians&#x27;,16,&#x27;New Testament&#x27;],[&#x27;2 Corinthians&#x27;,13,&#x27;New Testament&#x27;],[&#x27;Galatians&#x27;,6,&#x27;New Testament&#x27;],[&#x27;Ephesians&#x27;,6,&#x27;New Testament&#x27;],[&#x27;Philippians&#x27;,4,&#x27;New Testament&#x27;],[&#x27;Colossians&#x27;,4,&#x27;New Testament&#x27;],[&#x27;1 Thessalonians&#x27;,5,&#x27;New Testament&#x27;],[&#x27;2 Thessalonians&#x27;,3,&#x27;New Testament&#x27;],[&#x27;1 Timothy&#x27;,6,&#x27;New Testament&#x27;],[&#x27;2 Timothy&#x27;,4,&#x27;New Testament&#x27;],[&#x27;Titus&#x27;,3,&#x27;New Testament&#x27;],[&#x27;Philemon&#x27;,1,&#x27;New Testament&#x27;],[&#x27;Hebrews&#x27;,13,&#x27;New Testament&#x27;],[&#x27;James&#x27;,5,&#x27;New Testament&#x27;],[&#x27;1 Peter&#x27;,5,&#x27;New Testament&#x27;],[&#x27;2 Peter&#x27;,3,&#x27;New Testament&#x27;],[&#x27;1 John&#x27;,5,&#x27;New Testament&#x27;],[&#x27;2 John&#x27;,1,&#x27;New Testament&#x27;],[&#x27;3 John&#x27;,1,&#x27;New Testament&#x27;],[&#x27;Jude&#x27;,1,&#x27;New Testament&#x27;],[&#x27;Revelation&#x27;,22,&#x27;New Testament&#x27;]
   ];
-  let currentScreen = &#x27;scripture&#x27;; let activeBook = &#x27;John&#x27;; let activeChapter = 3; let activePassage = passages.bible; let activeVerse = &#x27;16&#x27;; let primaryVersion = &#x27;WEB&#x27;; let lastVerseTrigger = null;
-  const els = { picker: root.querySelector(&#x27;#st-picker&#x27;), scriptureScreen: root.querySelector(&#x27;#st-scripture-screen&#x27;), bookScreen: root.querySelector(&#x27;#st-book-screen&#x27;), chapterScreen: root.querySelector(&#x27;#st-chapter-screen&#x27;), readerScreen: root.querySelector(&#x27;#st-reader-screen&#x27;), list: root.querySelector(&#x27;#st-book-list&#x27;), chapterList: root.querySelector(&#x27;#st-chapter-list&#x27;), chapterHeading: root.querySelector(&#x27;#st-chapter-heading&#x27;), settings: root.querySelector(&#x27;#st-settings&#x27;), back: root.querySelector(&#x27;#st-back&#x27;), close: root.querySelector(&#x27;#st-close&#x27;), headerPassage: root.querySelector(&#x27;#st-header-passage&#x27;), verses: root.querySelector(&#x27;#st-verses&#x27;), selected: root.querySelector(&#x27;#st-selected&#x27;), hub: root.querySelector(&#x27;#st-biblehub&#x27;), primary: root.querySelector(&#x27;#st-primary-select&#x27;), compare: root.querySelector(&#x27;#st-compare&#x27;), compareGrid: root.querySelector(&#x27;#st-compare-grid&#x27;), compareSelect: root.querySelector(&#x27;#st-compare-select&#x27;), response: root.querySelector(&#x27;#st-response&#x27;), question: root.querySelector(&#x27;#st-question&#x27;) };
+  // Prototype authorship notes: https://rsc.byu.edu/new-testament-history-culture-society/gospel-john
+  // and https://rsc.byu.edu/new-testament-history-culture-society/synoptic-gospels
+  const chapterOverviews = {
+    &#x27;John 3&#x27;: {
+      summary: &quot;Jesus speaks with Nicodemus about new birth, belief, and God&#x27;s love. The chapter then turns to John the Baptist&#x27;s testimony about Jesus.&quot;,
+      book: &quot;After the signs and temple scene in John 2, this conversation develops the Gospel&#x27;s themes of life, light, and belief. John 4 continues with another encounter, this time with a Samaritan woman.&quot;,
+      author: &quot;Tradition attributes this Gospel to John. The text does not directly name its author; precise authorship, composition date, and original audience remain debated.&quot;,
+      history: &quot;The narrative introduces Nicodemus as a Pharisee and Jewish leader, then moves to Jesus and John the Baptist baptizing in Judea. John the Baptist is distinct from the traditionally named Gospel author.&quot;,
+      caution: &quot;The setting of these events and the later setting of the Gospel&#x27;s composition are different questions. Christian traditions also differ in how they understand birth through water and Spirit.&quot;,
+      references: [[&#x27;John&#x27;, 2], [&#x27;John&#x27;, 4], [&#x27;John&#x27;, 20]]
+    },
+    &#x27;Matthew 5&#x27;: {
+      summary: &quot;Jesus opens the Sermon on the Mount with the Beatitudes, then addresses the disciples&#x27; calling, the Law and Prophets, and the character of faithful living.&quot;,
+      book: &quot;Matthew 4 introduces Jesus teaching and gathering disciples. Chapters 5-7 form an extended teaching unit; read this chapter alongside the rest of the sermon rather than as isolated sayings.&quot;,
+      author: &quot;Tradition attributes this Gospel to Matthew. Authorship, dating, and the exact audience are debated. Its engagement with Israel&#x27;s scriptures is important for understanding the book.&quot;,
+      history: &quot;The scene brings Jesus, his disciples, and the crowds together on a mountain. The Law and Prophets frame the teaching in the scriptural life of the people addressed.&quot;,
+      caution: &quot;Distinguish the setting of Jesus&#x27; teaching from the later composition of the Gospel. Interpretations differ about how the sermon relates to the Law and to Christian practice.&quot;,
+      references: [[&#x27;Matthew&#x27;, 4], [&#x27;Matthew&#x27;, 6], [&#x27;Matthew&#x27;, 7]]
+    }
+  };
+  let currentScreen = &#x27;scripture&#x27;; let activeBook = &#x27;John&#x27;; let activeChapter = 3; let activePassage = passages.bible; let activeVerse = &#x27;16&#x27;; let primaryVersion = &#x27;WEB&#x27;; let lastStudyTrigger = null;
+  const els = {
+    picker: root.querySelector(&#x27;#st-picker&#x27;), scriptureScreen: root.querySelector(&#x27;#st-scripture-screen&#x27;),
+    bookScreen: root.querySelector(&#x27;#st-book-screen&#x27;), chapterScreen: root.querySelector(&#x27;#st-chapter-screen&#x27;),
+    readerScreen: root.querySelector(&#x27;#st-reader-screen&#x27;), list: root.querySelector(&#x27;#st-book-list&#x27;),
+    chapterList: root.querySelector(&#x27;#st-chapter-list&#x27;), chapterHeading: root.querySelector(&#x27;#st-chapter-heading&#x27;),
+    settings: root.querySelector(&#x27;#st-settings&#x27;), back: root.querySelector(&#x27;#st-back&#x27;), close: root.querySelector(&#x27;#st-close&#x27;),
+    headerPassage: root.querySelector(&#x27;#st-header-passage&#x27;), verses: root.querySelector(&#x27;#st-verses&#x27;),
+    selected: root.querySelector(&#x27;#st-selected&#x27;), hub: root.querySelector(&#x27;#st-biblehub&#x27;),
+    primary: root.querySelector(&#x27;#st-primary-select&#x27;), compareGrid: root.querySelector(&#x27;#st-compare-grid&#x27;),
+    translations: root.querySelector(&#x27;#st-verse-translations&#x27;), verseTools: root.querySelector(&#x27;#st-verse-tools&#x27;),
+    studyHeading: root.querySelector(&#x27;#st-study-heading&#x27;), overview: root.querySelector(&#x27;#st-chapter-overview&#x27;),
+    response: root.querySelector(&#x27;#st-response&#x27;), question: root.querySelector(&#x27;#st-question&#x27;),
+    study: root.querySelector(&#x27;#st-study-panel&#x27;)
+  };
   function passage() { return activePassage; }
   function verseList() { return passage()?.versions?.[primaryVersion] || []; }
   function showScreen(screen) { currentScreen = screen; els.picker.hidden = screen === &#x27;reader&#x27;; els.scriptureScreen.hidden = screen !== &#x27;scripture&#x27;; els.bookScreen.hidden = screen !== &#x27;books&#x27;; els.chapterScreen.hidden = screen !== &#x27;chapters&#x27;; els.readerScreen.hidden = screen !== &#x27;reader&#x27;; els.back.hidden = screen === &#x27;scripture&#x27;; els.settings.hidden = screen !== &#x27;reader&#x27;; els.headerPassage.innerHTML = screen === &#x27;scripture&#x27; ? &#x27;Study &lt;span&gt;Table&lt;/span&gt;&#x27; : screen === &#x27;books&#x27; ? &#x27;Holy Bible&#x27; : screen === &#x27;chapters&#x27; ? activeBook : `${activeBook} ${activeChapter}`; }
   function renderBooks() { els.list.innerHTML = [&#x27;Old Testament&#x27;,&#x27;New Testament&#x27;].map(testament =&gt; `&lt;div class=&quot;st-testament&quot;&gt;${testament}&lt;/div&gt;&lt;div class=&quot;st-choice-grid&quot;&gt;${bookCatalog.filter(book =&gt; book[2] === testament).map(book =&gt; `&lt;button class=&quot;st-choice&quot; type=&quot;button&quot; data-book=&quot;${book[0]}&quot;&gt;${book[0]}&lt;/button&gt;`).join(&#x27;&#x27;)}&lt;/div&gt;`).join(&#x27;&#x27;); }
   function renderChapters() { const book = bookCatalog.find(item =&gt; item[0] === activeBook); els.chapterHeading.textContent = `Choose a chapter in ${activeBook}`; els.chapterList.innerHTML = Array.from({ length: book[1] }, (_, index) =&gt; `&lt;button class=&quot;st-choice&quot; type=&quot;button&quot; data-chapter=&quot;${index + 1}&quot;&gt;${index + 1}&lt;/button&gt;`).join(&#x27;&#x27;); }
-  function renderCompare() { const p = passage(); if (!p?.compare) return; const secondary = els.compareSelect.value; els.compareGrid.innerHTML = `&lt;div class=&quot;st-translation-card&quot;&gt;&lt;strong&gt;${primaryVersion}&lt;/strong&gt;${p.compare[primaryVersion]}&lt;/div&gt;&lt;div class=&quot;st-translation-card&quot;&gt;&lt;strong&gt;${secondary}&lt;/strong&gt;${p.compare[secondary]}&lt;/div&gt;`; }
-  function closeStudy(restoreFocus = true) { root.querySelector(&#x27;.st-app&#x27;).classList.remove(&#x27;has-selection&#x27;); els.verses.querySelectorAll(&#x27;.st-verse&#x27;).forEach(el =&gt; el.classList.remove(&#x27;is-selected&#x27;)); if (restoreFocus &amp;&amp; lastVerseTrigger) lastVerseTrigger.focus(); }
-  function selectVerse(number, trigger) { activeVerse = number; lastVerseTrigger = trigger; els.verses.querySelectorAll(&#x27;.st-verse&#x27;).forEach(el =&gt; el.classList.toggle(&#x27;is-selected&#x27;, el.dataset.verse === number)); els.selected.textContent = `${activeBook} ${activeChapter}:${number} · ${primaryVersion}`; root.querySelector(&#x27;.st-app&#x27;).classList.add(&#x27;has-selection&#x27;); const slug = activeBook.toLowerCase().replace(/\s+/g, &#x27;-&#x27;); els.hub.href = `https://biblehub.com/${slug}/${activeChapter}-${number}.htm`; renderCompare(); els.response.innerHTML = &#x27;&lt;p&gt;Choose a prompt or ask a focused question about this selected passage.&lt;/p&gt;&#x27;; els.close.focus(); }
+  function renderCompare() {
+    const versions = [primaryVersion, ...[&#x27;KJV&#x27;, &#x27;WEB&#x27;].filter(version =&gt; version !== primaryVersion)];
+    els.compareGrid.replaceChildren(...versions.map(version =&gt; {
+      const card = document.createElement(&#x27;div&#x27;); card.className = &#x27;st-translation-card&#x27;;
+      const label = document.createElement(&#x27;strong&#x27;); label.textContent = version;
+      const name = document.createElement(&#x27;small&#x27;);
+      name.textContent = (version === primaryVersion ? &#x27;Reading translation · &#x27; : &#x27;&#x27;) + (version === &#x27;KJV&#x27; ? &#x27;King James Version&#x27; : &#x27;World English Bible&#x27;);
+      const text = document.createElement(&#x27;p&#x27;);
+      const verse = passage()?.versions?.[version]?.find(item =&gt; item[0] === activeVerse);
+      text.textContent = verse ? verse[1] : &#x27;This verse is not available in this prototype translation.&#x27;;
+      card.append(label, name, text); return card;
+    }));
+  }
+  function appendSection(title, text) {
+    const heading = document.createElement(&#x27;h3&#x27;); heading.textContent = title;
+    const paragraph = document.createElement(&#x27;p&#x27;); paragraph.textContent = text;
+    els.response.append(heading, paragraph);
+  }
+  function openChapterOverview() {
+    lastStudyTrigger = els.overview;
+    els.verses.querySelectorAll(&#x27;.st-verse&#x27;).forEach(el =&gt; el.classList.remove(&#x27;is-selected&#x27;));
+    els.studyHeading.textContent = &#x27;Chapter overview&#x27;;
+    els.selected.textContent = `${activeBook} ${activeChapter} · ${primaryVersion} · Whole chapter`;
+    els.translations.hidden = true; els.translations.open = false; els.verseTools.hidden = true;
+    els.question.value = &#x27;&#x27;; els.response.replaceChildren();
+    const overview = chapterOverviews[`${activeBook} ${activeChapter}`];
+    if (overview) {
+      appendSection(&#x27;At a glance&#x27;, overview.summary);
+      appendSection(&#x27;Where it fits in the book&#x27;, overview.book);
+      appendSection(&#x27;Author &amp; audience&#x27;, overview.author);
+      appendSection(&#x27;Historical setting &amp; people&#x27;, overview.history);
+      appendSection(&#x27;Interpretive caution&#x27;, overview.caution);
+      const references = document.createElement(&#x27;p&#x27;); references.append(&#x27;Read alongside: &#x27;);
+      overview.references.forEach(([book, chapter], index) =&gt; {
+        if (index) references.append(&#x27; · &#x27;);
+        const link = document.createElement(&#x27;a&#x27;);
+        link.textContent = `${book} ${chapter}`;
+        link.href = `#bible/${book.toLowerCase()}/${chapter}`;
+        link.addEventListener(&#x27;click&#x27;, event =&gt; {
+          event.preventDefault(); activeBook = book; renderChapters(); openReader(chapter);
+        });
+        references.append(link);
+      });
+      els.response.append(references);
+    } else {
+      appendSection(&#x27;Chapter overview preview&#x27;, `The finished app will ask Gemini for an overview of ${activeBook} ${activeChapter} and reuse the saved response on future visits. For a filled-in sample, choose John 3 or Matthew 5.`);
+      appendSection(&#x27;Where it fits in the book&#x27;, &#x27;The overview will connect the full chapter to the surrounding chapters and the purpose of the book.&#x27;);
+      appendSection(&#x27;Author &amp; audience&#x27;, &#x27;It will explain traditional authorship, intended readers, and uncertainty about attribution or dating.&#x27;);
+      appendSection(&#x27;Historical setting &amp; people&#x27;, &#x27;It will describe the people and circumstances involved, distinguishing the events from the later composition of the book.&#x27;);
+    }
+    root.querySelector(&#x27;.st-app&#x27;).classList.add(&#x27;has-selection&#x27;);
+    els.overview.setAttribute(&#x27;aria-expanded&#x27;, &#x27;true&#x27;);
+    els.study.scrollTop = 0; els.close.focus({ preventScroll: true });
+  }
+  function closeStudy(restoreFocus = true) {
+    root.querySelector(&#x27;.st-app&#x27;).classList.remove(&#x27;has-selection&#x27;);
+    els.verses.querySelectorAll(&#x27;.st-verse&#x27;).forEach(el =&gt; el.classList.remove(&#x27;is-selected&#x27;));
+    els.overview.setAttribute(&#x27;aria-expanded&#x27;, &#x27;false&#x27;); els.translations.open = false;
+    if (restoreFocus &amp;&amp; lastStudyTrigger) lastStudyTrigger.focus({ preventScroll: true });
+  }
+  function selectVerse(number, trigger) {
+    activeVerse = String(number); lastStudyTrigger = trigger;
+    els.verses.querySelectorAll(&#x27;.st-verse&#x27;).forEach(el =&gt; el.classList.toggle(&#x27;is-selected&#x27;, el.dataset.verse === activeVerse));
+    els.studyHeading.textContent = &#x27;Study this verse&#x27;;
+    els.selected.textContent = `${activeBook} ${activeChapter}:${activeVerse} · ${primaryVersion}`;
+    root.querySelector(&#x27;.st-app&#x27;).classList.add(&#x27;has-selection&#x27;);
+    els.overview.setAttribute(&#x27;aria-expanded&#x27;, &#x27;false&#x27;);
+    els.translations.hidden = false; els.translations.open = false; els.verseTools.hidden = false;
+    els.question.value = &#x27;&#x27;;
+    const slug = activeBook.toLowerCase().replace(/\s+/g, &#x27;-&#x27;);
+    els.hub.href = `https://biblehub.com/${slug}/${activeChapter}-${activeVerse}.htm`;
+    renderCompare();
+    els.response.innerHTML = &#x27;&lt;p&gt;Expand Translations to compare this verse, choose a prompt, or ask a focused question.&lt;/p&gt;&#x27;;
+    els.study.scrollTop = 0; els.close.focus({ preventScroll: true });
+  }
   function renderReader() { const p = passage(); closeStudy(false); els.primary.value = primaryVersion; els.verses.innerHTML = p ? verseList().map(v =&gt; `&lt;button class=&quot;st-verse&quot; type=&quot;button&quot; data-verse=&quot;${v[0]}&quot;&gt;&lt;sup&gt;${v[0]}&lt;/sup&gt;${v[1]}&lt;/button&gt;`).join(&#x27;&#x27;) : `&lt;div class=&quot;st-reader-note&quot;&gt;&lt;strong&gt;${activeBook} ${activeChapter}&lt;/strong&gt;&lt;br&gt;The navigation is fully represented in this prototype. The production reader will populate this chapter from the bundled Bible corpus. For a complete passage preview, choose Matthew 5 or John 3.&lt;/div&gt;`; els.response.innerHTML = &#x27;&lt;p&gt;Choose a prompt or ask a focused question about this selected passage.&lt;/p&gt;&#x27;; }
   function openReader(chapter) { activeChapter = Number(chapter); activePassage = activeBook === &#x27;John&#x27; &amp;&amp; activeChapter === 3 ? passages.bible : activeBook === &#x27;Matthew&#x27; &amp;&amp; activeChapter === 5 ? matthewFive : null; renderReader(); showScreen(&#x27;reader&#x27;); }
-  function studyResponse(kind, question) { const ref = els.selected.textContent; const copy = { context: `&lt;p&gt;&lt;strong&gt;Immediate context.&lt;/strong&gt; ${ref} belongs to a larger literary unit. Read the surrounding paragraph before treating the selected sentence in isolation.&lt;/p&gt;`, related: `&lt;p&gt;&lt;strong&gt;Related passages.&lt;/strong&gt; &lt;a href=&quot;#&quot;&gt;Romans 5:8&lt;/a&gt; and &lt;a href=&quot;#&quot;&gt;Isaiah 53:5&lt;/a&gt; offer useful canonical connections.&lt;/p&gt;`, wordStudy: `&lt;p&gt;&lt;strong&gt;Source-language study.&lt;/strong&gt; The production response will identify the tagged Hebrew or Greek term, transliteration, grammar, lexical range, and contextual sense. Lexical range is not a single hidden meaning.&lt;/p&gt;` }; els.response.innerHTML = question ? `&lt;p&gt;&lt;strong&gt;Your question:&lt;/strong&gt; ${question}&lt;/p&gt;&lt;p&gt;This response stays anchored to ${ref}, distinguishes observation from interpretation, and links verified Bible references.&lt;/p&gt;` : copy[kind]; }
+  function studyResponse(kind, question) {
+    const ref = els.selected.textContent;
+    els.response.replaceChildren();
+    if (question) {
+      appendSection(&#x27;Your question&#x27;, question);
+      appendSection(&#x27;Passage-scoped answer preview&#x27;, `The finished app will ask Gemini about ${ref}, distinguish observations from interpretations, and link verified Bible references.`);
+      return;
+    }
+    const copy = {
+      context: [&#x27;Immediate context&#x27;, `${ref} belongs to a larger literary unit. Read the surrounding paragraph before treating the selected sentence in isolation. Use Chapter overview for the wider book and historical setting.`],
+      related: [&#x27;Related passages preview&#x27;, &#x27;The finished app will return related passages for this exact verse, with a short explanation of each connection and verified local links.&#x27;],
+      wordStudy: [&#x27;Source-language study&#x27;, &#x27;The production response will identify the tagged Hebrew or Greek term, transliteration, grammar, lexical range, and contextual sense. Lexical range is not a single hidden meaning.&#x27;]
+    };
+    if (copy[kind]) appendSection(...copy[kind]);
+  }
+  els.overview.addEventListener(&#x27;click&#x27;, openChapterOverview);
   root.querySelector(&#x27;#st-choose-bible&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; showScreen(&#x27;books&#x27;));
   els.list.addEventListener(&#x27;click&#x27;, event =&gt; { const button = event.target.closest(&#x27;[data-book]&#x27;); if (!button) return; activeBook = button.dataset.book; renderChapters(); showScreen(&#x27;chapters&#x27;); });
   els.chapterList.addEventListener(&#x27;click&#x27;, event =&gt; { const button = event.target.closest(&#x27;[data-chapter]&#x27;); if (button) openReader(button.dataset.chapter); });
@@ -1309,8 +1446,7 @@ html&gt;body{padding:0}&lt;/style&gt;
   root.querySelectorAll(&#x27;.st-action[data-answer]&#x27;).forEach(button =&gt; button.addEventListener(&#x27;click&#x27;, () =&gt; studyResponse(button.dataset.answer)));
   root.querySelector(&#x27;#st-send&#x27;).addEventListener(&#x27;click&#x27;, () =&gt; { const q = els.question.value.trim(); if (q) { studyResponse(&#x27;&#x27;, q); els.question.value = &#x27;&#x27;; } });
   els.question.addEventListener(&#x27;keydown&#x27;, event =&gt; { if (event.key === &#x27;Enter&#x27;) root.querySelector(&#x27;#st-send&#x27;).click(); });
-  els.primary.addEventListener(&#x27;change&#x27;, event =&gt; { primaryVersion = event.target.value; if (els.compareSelect.value === primaryVersion) els.compareSelect.value = primaryVersion === &#x27;WEB&#x27; ? &#x27;KJV&#x27; : &#x27;WEB&#x27;; renderReader(); });
-  els.compareSelect.addEventListener(&#x27;change&#x27;, renderCompare);
+  els.primary.addEventListener(&#x27;change&#x27;, event =&gt; { primaryVersion = event.target.value; renderReader(); });
   els.back.addEventListener(&#x27;click&#x27;, () =&gt; { closeStudy(false); if (currentScreen === &#x27;reader&#x27;) showScreen(&#x27;chapters&#x27;); else if (currentScreen === &#x27;chapters&#x27;) showScreen(&#x27;books&#x27;); else showScreen(&#x27;scripture&#x27;); });
   els.close.addEventListener(&#x27;click&#x27;, () =&gt; closeStudy());
   root.addEventListener(&#x27;keydown&#x27;, event =&gt; { if (event.key === &#x27;Escape&#x27; &amp;&amp; root.querySelector(&#x27;.st-app&#x27;).classList.contains(&#x27;has-selection&#x27;)) closeStudy(); });

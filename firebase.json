@@ -1,0 +1,12 @@
+{
+  "apphosting": [{
+    "backendId": "study-table-preview",
+    "rootDir": ".",
+    "alwaysDeployFromSource": true,
+    "ignore": ["node_modules", ".git", ".next", ".cache", ".firebase", ".env*", "*-debug.log", "test-results", "playwright-report", "coverage"]
+  }],
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

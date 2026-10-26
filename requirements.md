@@ -38,10 +38,20 @@ The product should help a person go deeper without making the AI feel like a rep
 - Offer a readable comparison layout: inline switching on narrow screens and parallel columns on wider screens.
 - Keep verse numbering aligned and make omitted/combined verses apparent.
 - Show translation name, abbreviation, and any required copyright attribution where the text is displayed.
+- When a reader taps a verse, include a collapsed **Translations** section in that verse's study panel. Expanding it shows the exact selected verse in KJV and WEB, with the reading translation first and each version clearly labeled. Use parallel cards on wide screens and stacked cards on narrow screens. Changing verses updates the text and collapses the section; closing the panel restores the reading view. Additional approved translations can be added to this section later.
 
 ### 4.3 AI study actions
 
-For a selected verse or passage, provide quick, intentionally scoped actions:
+Provide a visible **Chapter overview** button above the chapter text, available without selecting a verse. It opens the study sheet for the entire chapter and explains:
+
+- What happens in the chapter and its main themes.
+- Where the chapter fits in the book's structure and argument, including the surrounding chapters.
+- The author or traditional attribution, intended audience, and relevant historical setting.
+- The people and communities involved and the circumstances that help explain the chapter.
+
+Distinguish the historical setting of the events from the setting in which the book was written. Identify uncertainty or disagreement about authorship, dating, audience, and historical reconstruction rather than presenting a disputed attribution as settled fact. Link relevant scripture references, keep the selected chapter and translation visible, and let the reader close the sheet without losing their place.
+
+For a selected verse, provide quick, intentionally scoped actions:
 
 - **Deeper context:** historical setting, immediate literary context, key terms, and major interpretive considerations.
 - **Related verses:** thematically and textually connected passages, with a short explanation of each connection.
@@ -60,6 +70,16 @@ AI responses must:
 - Include a brief notice that AI assistance may be incomplete and should be checked against reliable sources.
 
 Word-study responses must name the source-language text/edition used, distinguish lexical range from the meaning in this specific passage, and avoid presenting a single "secret" English meaning.
+
+### 4.4 Gemini and response caching
+
+- **Use Google Gemini for all AI generation**, including chapter overviews, verse context, related verses, word studies, and custom questions. Call Gemini only from the server; keep the API key out of the browser. The model is configurable server-side.
+- Persist successful, validated standard chapter and verse responses in a shared server-side cache. Reopening a chapter overview or requesting the same verse action reuses the saved response across visits and visitors instead of generating it again.
+- Cache identity includes the scripture work, canonical chapter or verse, translation and corpus edition, action, output language, Gemini model, prompt/response-schema version, and relevant source-data versions. Different passages, translations, actions, or source versions must not collide.
+- Check the cache before reserving generation quota or calling Gemini. A cache hit makes no Gemini request and consumes no AI-generation allowance. Concurrent requests for the same missing response share one generation; waiting readers receive its saved result.
+- Keep reusable responses until an owner invalidates them or a model, prompt, schema, corpus, or source change creates a new cache version. Do not regenerate simply because a reader revisits a passage. Do not cache failures, incomplete responses, or responses that fail validation.
+- Reuse identical custom questions and their answers within the current browser session, keyed by passage, translation, exact trimmed question, and generation versions. Do not place personalized questions or their answers in the shared persistent cache or retain them as personal study history.
+- Shared generated study content is an application cache, distinct from user notes or saved AI conversations. Its existence does not add accounts or saved personal history to MVP.
 
 ## 5. Decisions to make before implementation
 
@@ -91,7 +111,7 @@ Adding the Book of Mormon makes Study Table a multi-scripture workspace and chan
 
 Notes are highly valuable because they turn a reader into a long-term user. Requiring login before someone can read, however, adds friction and creates privacy/security obligations.
 
-**Decision:** Notes, highlights, saved AI history, and cloud synchronization are post-MVP. MVP will not persist personal study data.
+**Decision:** Notes, highlights, saved personal AI history, and cloud synchronization are post-MVP. MVP will not persist personal study data. Shared, reusable Gemini-generated chapter and verse content is persisted as an application cache as specified in section 4.4.
 
 Open question: When notes return, is local-only storage sufficient before adding sync?
 
@@ -99,7 +119,7 @@ Open question: When notes return, is local-only storage sufficient before adding
 
 AI can make the app distinctive but needs strong boundaries: response quality varies, usage has a cost, and theological framing can be sensitive. Custom questions increase the value of the feature, but also make rate limits, moderation, and clear source boundaries more important.
 
-**Decision:** AI study actions and passage-scoped custom questions are free to visitors. Enforce 10 AI answers per anonymized server-side request bucket per UTC day and a configurable global limit that defaults to 50 answers per UTC day. The interface may show the remaining allowance but must not present a browser-only counter as a security boundary. Do not offer a free-floating, unrestricted theological chat in MVP.
+**Decision:** Use Google Gemini. Chapter overviews, verse study actions, and passage-scoped custom questions are free to visitors. Enforce 10 new AI generations per anonymized server-side request bucket per UTC day and a configurable global limit that defaults to 50 new generations per UTC day. Cached responses remain available when generation allowance is exhausted and do not count toward these limits. Apply a separate server-side request throttle to cached and uncached requests. The interface may show the remaining generation allowance but must not present a browser-only counter as a security boundary. Do not offer a free-floating, unrestricted theological chat in MVP.
 
 ### F. Personal-project access and show-and-tell controls
 
@@ -117,20 +137,27 @@ Use one shared invite password for the creator and trusted friends. If the app l
 2. Reader chooses **Holy Bible**.
 3. Reader chooses a book and then a chapter.
 4. App opens that chapter in the primary translation.
-5. Reader can select a verse, switch translations, or open comparison.
+5. Reader can open **Chapter overview**, select a verse, switch translations, or open comparison.
 
 Returning readers may resume their locally stored last passage. Direct reference URLs bypass the chooser and open the stated chapter and verse.
 
+### Understand a chapter
+
+1. Reader opens a chapter and chooses **Chapter overview** above its text.
+2. The study sheet identifies the entire chapter and translation, with sections for the chapter summary, its place in the book, authorship and audience, and historical setting and people.
+3. The app returns a matching cached overview, or asks Gemini once and caches the validated result for reuse.
+4. Reader can follow linked scripture references or close the overview and continue reading in place. Selecting a verse switches the sheet to that verse's study tools.
+
 ### Explore a verse
 
-1. Reader selects one verse or a small passage range.
-2. Reader chooses **Deeper context**, **Related verses**, or enters a custom question in **Ask about this passage**.
+1. Reader selects one verse.
+2. Reader may expand **Translations** to compare that verse in KJV and WEB, choose **Deeper context**, **Related verses**, or enter a custom question in **Ask about this passage**.
 3. App displays an AI response with linked scripture references and a clear source/interpretation distinction.
 4. Reader can open a referenced passage without losing their place.
 
 ### Ask a custom question about a verse
 
-1. Reader highlights a verse or passage range.
+1. Reader selects a verse.
 2. An inline study panel identifies the selection and offers a question field.
 3. Reader asks a free-form question.
 4. App responds in the context of the selected passage, declares the translation used, and links every cited scripture reference.
@@ -142,7 +169,7 @@ Returning readers may resume their locally stored last passage. Direct reference
 - Denomination-specific authoritative interpretation.
 - Scraping or republishing third-party commentary without permission.
 - Social feeds, public notes, groups, or collaborative editing.
-- Notes, highlights, saved AI conversations, and cloud synchronization.
+- Notes, highlights, saved personal AI conversations, and cloud synchronization. Shared generated-response caching is included in MVP.
 - An open-ended AI companion with unrestricted conversation history.
 - Book of Mormon or other additional scripture works.
 - Paid subscriptions, unless necessary to cover an approved text license or AI costs.
@@ -151,6 +178,9 @@ Returning readers may resume their locally stored last passage. Direct reference
 
 - A reader can reach a Bible passage and begin reading in under a few seconds.
 - A reader can compare KJV and WEB side by side.
+- Selecting a verse exposes a collapsed Translations section that expands to show that exact verse in KJV and WEB and updates correctly when the selection changes.
+- A reader can request a Gemini chapter overview explaining its place in the book, authorship/audience, and the historical setting of the people involved, with uncertainty clearly identified.
+- Repeated standard chapter and verse requests reuse persisted responses without new Gemini calls or generation-quota charges; simultaneous identical requests generate only once.
 - AI actions return useful, passage-specific study help with working linked references and no unsupported quotations.
 - Each Bible verse provides a working, clearly external Bible Hub link.
 - The app makes source ownership and translation attribution clear.
@@ -162,7 +192,7 @@ Returning readers may resume their locally stored last passage. Direct reference
 | --- | --- | --- |
 | 0 — Validate | Content licensing, source strategy, AI response rubric | Confirm what text and reference material we may show. |
 | 1 — Reader | KJV + WEB Bible reader, work/book/chapter navigation, search, responsive UI | A trustworthy, fast Bible reading experience. |
-| 2 — Study tools | Scoped AI context, related verses, word studies, custom questions, Bible Hub links | The differentiating study experience. |
+| 2 — Study tools | Gemini chapter overviews, scoped verse context, related verses, word studies, custom questions, response caching, Bible Hub links | The differentiating study experience. |
 | 3 — Personal workspace | Optional accounts, sync, notes, highlights, export/delete | Long-term personal study utility. |
 | 4 — Additional works | Book of Mormon, more approved translations, and selected works | Broader coverage after source rights are validated. |
 
@@ -170,3 +200,4 @@ Returning readers may resume their locally stored last passage. Direct reference
 
 - Build first for a curious independent reader who values a calm reading experience and optional context.
 - Use a neutral, source-aware AI tone in warm, plain language. Present denominational readings as perspectives rather than conclusions.
+- Google Gemini is the AI provider. Persist and reuse validated standard chapter and verse responses through the shared server-side cache.
