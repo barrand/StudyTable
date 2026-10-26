@@ -14,7 +14,7 @@ const {render,screen,fireEvent,cleanup,waitFor}=await import('@testing-library/r
 const {default:Reader}=await import('../src/components/reader');
 const chapters={WEB:await loadChapter({book:'JHN',chapter:3},'WEB'),KJV:await loadChapter({book:'JHN',chapter:3},'KJV')};
 const answer={result:{observations:['The passage is part of a conversation.'],interpretations:[],relatedReferences:[],cautions:[],summary:'A chapter summary',bookContext:'In the book',authorshipAndAudience:'Authorship is debated.',historicalSettingAndPeople:'Nicodemus and Jesus.'},reference:'John 3',translation:'WEB',action:'chapter-overview',cached:true,generatedAt:'2026-10-25T00:00:00Z',model:'test-gemini',cacheVersion:'1'};
-afterEach(()=>{cleanup();localStorage.clear();});
+afterEach(()=>{cleanup();localStorage.clear();window.history.replaceState(null,'','/');});
 
 test('reader verse disclosure uses exact corpus text, closes/reset on selection, and restores focus',async()=>{
   render(<Reader book={books[42]} chapters={chapters}/>);
@@ -78,4 +78,28 @@ test('study sheet follows the visual viewport when an on-screen keyboard reduces
     Object.assign(viewport,{height:844});fireEvent(viewport,new dom.window.Event('resize'));
     await waitFor(()=>assert.equal(sheet.style.getPropertyValue('--keyboard-inset'),'0px'));
   }finally{cleanup();Object.defineProperty(window,'visualViewport',{value:undefined,configurable:true});Object.defineProperty(window,'innerHeight',{value:originalHeight,configurable:true});}
+});
+
+test('session-local question reuse includes the server generation version',async()=>{
+  let calls=0;
+  globalThis.fetch=async(_url,init)=>{calls++;const input=JSON.parse(String(init?.body));return Response.json({...answer,reference:input.reference,action:'ask',conversationToken:'versioned-context',result:{observations:['A versioned answer.'],interpretations:[],relatedReferences:[],cautions:[]}});};
+  async function ask(version:string) {
+    const instance=render(<Reader book={books[42]} chapters={chapters} generationVersion={version}/>);
+    fireEvent.click(screen.getByRole('button',{name:'Study John 3:16'}));
+    fireEvent.change(screen.getByLabelText('Ask about this passage'),{target:{value:'A unique generation-version question'}});fireEvent.click(screen.getByRole('button',{name:'Ask'}));
+    await screen.findByLabelText('Ask a follow-up about this passage');instance.unmount();
+  }
+  await ask('version-a');assert.equal(calls,1);
+  await ask('version-a');assert.equal(calls,1);
+  await ask('version-b');assert.equal(calls,2);
+});
+
+test('selected verse and translation remain shareable and become the locally resumed passage',async()=>{
+  render(<Reader book={books[42]} chapters={chapters} initialVerse={16} initialTranslation="WEB"/>);
+  fireEvent.click(screen.getByRole('button',{name:'Study John 3:17'}));
+  assert.equal(window.location.pathname+window.location.search,'/bible/john/3?verse=17&translation=WEB');
+  fireEvent.click(screen.getByRole('button',{name:'Close study panel'}));
+  fireEvent.click(screen.getByRole('button',{name:'Settings'}));fireEvent.change(screen.getByLabelText('Reading translation'),{target:{value:'KJV'}});
+  assert.equal(window.location.search,'?verse=17&translation=KJV');
+  const last=JSON.parse(localStorage.getItem('study-table:last-read')!);assert.equal(last.url,'/bible/john/3?verse=17&translation=KJV');assert.equal(last.label,'John 3:17');
 });

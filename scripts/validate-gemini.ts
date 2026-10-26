@@ -2,14 +2,16 @@ import { ownerSdk, PROJECT } from './firebase-owner';
 import { generateWithGemini } from '../src/server/gemini';
 import { study } from '../src/server/study-service';
 import { MemoryStore } from '../src/server/store';
+import { DEFAULT_GEMINI_MODEL } from '../src/lib/study-versions';
 import { mkdir, writeFile } from 'node:fs/promises';
+import assert from 'node:assert/strict';
 
 // Owner-triggered smoke validation: secret stays inside this process and is never printed.
 const sdk=await ownerSdk();
 const key=(await sdk.secretManager.accessSecretVersion(PROJECT,'STUDY_GEMINI_API_KEY','latest') as string).trim();
 if(!key||key.length>512)throw new Error('Unexpected Gemini credential format.');
 const store=new MemoryStore();let calls=0;
-const model=process.env.GEMINI_MODEL??'gemini-3.1-flash-lite';
+const model=process.env.GEMINI_MODEL??DEFAULT_GEMINI_MODEL;
 const checks:unknown[]=[];await mkdir('.cache',{recursive:true});
 for(const input of [
   {reference:'John 3',action:'chapter-overview'},
@@ -25,4 +27,7 @@ for(const input of [
   checks.push({request,answer:result});await writeFile('.cache/live-gemini-report.json',JSON.stringify({model,checks},null,2)+'\n');
   console.log(`${request.reference} ${request.action}: validated; ${result.result.relatedReferences.length} verified links; ${result.terms?.length??0} source-backed terms; cache reused.`);
 }
-console.log(`Live Gemini validation passed: ${calls} bounded generations; cache hits made no additional calls.`);
+const callsBeforeCeiling=calls;
+await assert.rejects(()=>study({reference:'John 3:18',action:'context',translation:'WEB'},'owner-validation',{store,secret:'owner-smoke-test-only-never-deployed',model,perKeyLimit:4,globalLimit:4,generate:async()=>{calls++;throw new Error('The generation ceiling must prevent this call.');}}),/allowance/);
+assert.equal(calls,callsBeforeCeiling);
+console.log(`Live Gemini validation passed: ${calls} bounded generations; cache hits made no additional calls; the next new generation was blocked before contacting Gemini.`);

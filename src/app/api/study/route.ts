@@ -2,9 +2,10 @@ import { hasSession } from '@/server/session';
 import { boundedText, checkOrigin, errorResponse } from '@/server/http';
 import { getStore } from '@/server/store';
 import { ServiceError } from '@/server/errors';
-import { clientIp } from '@/server/limits';
+import { clientIp, trustedProxyHops } from '@/server/limits';
 import { generateWithGemini } from '@/server/gemini';
 import { study } from '@/server/study-service';
+import { DEFAULT_GEMINI_MODEL } from '@/lib/study-versions';
 export const runtime='nodejs';
 export const maxDuration=60;
 function limit(name:string,defaultValue:number) {
@@ -21,8 +22,8 @@ export async function POST(request:Request) {
     const key=process.env.GEMINI_API_KEY;const secret=process.env.RATE_LIMIT_SECRET;
     if(!key)throw new ServiceError(503,'Gemini study tools are not configured yet. Reading and translation comparison are available.');
     if(!secret||secret.length<32)throw new ServiceError(503,'AI request limits are not configured yet.');
-    const model=process.env.GEMINI_MODEL??'gemini-3.1-flash-lite';
-    const result=await study(body,clientIp(request.headers,Math.max(1,Math.min(5,Number(process.env.TRUSTED_PROXY_HOPS)||1))),{
+    const model=process.env.GEMINI_MODEL??DEFAULT_GEMINI_MODEL;
+    const result=await study(body,clientIp(request.headers,trustedProxyHops()),{
       store:getStore(),secret,model,version:process.env.AI_CACHE_VERSION??'1',
       perKeyLimit:limit('AI_PER_KEY_DAILY_LIMIT',10),globalLimit:limit('AI_GLOBAL_DAILY_LIMIT',50),
       generate:(input,context)=>generateWithGemini(input,context,{key,model})

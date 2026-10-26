@@ -9,10 +9,13 @@ import { reserveQuota, throttle } from './limits';
 import type { Store } from './store';
 import { wordTerms } from './words';
 import { nextConversation, readConversation } from './conversation';
+import { PROMPT_VERSION, SCHEMA_VERSION } from '../lib/study-versions';
 
 const CORPUS_VERSION=manifest.sources.map(s=>`${s.translation}:${s.sha256}`).join('|');
-export const PROMPT_VERSION='study-4';
-export const SCHEMA_VERSION='study-2';
+export { PROMPT_VERSION, SCHEMA_VERSION } from '../lib/study-versions';
+export function studyGenerationVersion(model:string,version='1',sourceVersion=wordManifest.version) {
+  return createHash('sha256').update(JSON.stringify({model,version,prompt:PROMPT_VERSION,schema:SCHEMA_VERSION,corpus:CORPUS_VERSION,sourceVersion,language:'en'})).digest('hex');
+}
 export function studyCacheKey(request:StudyRequest,model:string,version='1',sourceVersion=wordManifest.version) {
   return createHash('sha256').update(JSON.stringify({work:'bible',reference:request.reference,scope:request.action==='chapter-overview'?'chapter':'verse',translation:request.translation,action:request.action,language:'en',model,version,prompt:PROMPT_VERSION,schema:SCHEMA_VERSION,corpus:CORPUS_VERSION,sourceVersion})).digest('hex');
 }
@@ -82,7 +85,7 @@ export async function study(raw:unknown,ip:string,options:StudyOptions):Promise<
     const generatedAt=new Date(now()).toISOString();
     if(request.action!=='ask')await options.store.transaction(async tx=>{
       const lease=await tx.get(leaseKey);if(lease?.owner!==owner)throw new ServiceError(425,'The study generation expired. Please try again.',2);
-      tx.set(cacheKey,{result,generatedAt,model:options.model,cacheVersion:version,sourceVersion:options.sourceVersion??wordManifest.version});
+      tx.set(cacheKey,{result,generatedAt,model:options.model,cacheVersion:version,sourceVersion:options.sourceVersion??wordManifest.version,promptVersion:PROMPT_VERSION,schemaVersion:SCHEMA_VERSION,corpusVersion:CORPUS_VERSION,language:'en',work:'bible',reference:request.reference,translation:request.translation,action:request.action});
     });
     return {result,reference:request.reference,translation:request.translation,action:request.action,cached:false,generatedAt,model:options.model,cacheVersion:version,remaining,...(terms.length?{terms:terms.filter(t=>result.terms?.some(term=>term.id===t.id))}:{}),...(request.action==='ask'?{conversationToken:nextConversation(request.reference,request.translation,conversation,request.question!,result,options.secret,now())}:{})};
   } finally {

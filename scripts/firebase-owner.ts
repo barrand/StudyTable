@@ -12,7 +12,8 @@ export async function ownerSdk() {
   const account=require('../auth').getGlobalDefaultAccount();
   if(!account)throw new Error('Sign in with firebase login before running owner tools.');
   await require('../requireAuth').requireAuth({project:PROJECT,...account,nonInteractive:true});
-  return {secretManager:require('../gcp/secretManager'),resourceManager:require('../gcp/resourceManager'),apphosting:require('../gcp/apphosting')};
+  const loggingClient=new (require('../apiv2').Client)({urlPrefix:require('../api').cloudloggingOrigin(),apiVersion:'v2',auth:true});
+  return {secretManager:require('../gcp/secretManager'),resourceManager:require('../gcp/resourceManager'),apphosting:require('../gcp/apphosting'),firestore:require('../gcp/firestore'),logging:require('../gcp/cloudlogging'),loggingClient};
 }
 export function firebaseOwner(args:string[],input?:string):Promise<string> {
   const cli=process.env.FIREBASE_CLI_PATH??join(process.env.APPDATA??'', 'npm','node_modules','firebase-tools','lib','bin','firebase.js');

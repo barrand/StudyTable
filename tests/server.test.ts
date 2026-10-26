@@ -2,8 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { devBypass, hashPassword, verifyPassword, signSession, verifySession, SESSION_SECONDS } from '../src/server/auth';
 import { MemoryStore } from '../src/server/store';
-import { bucketId, clientIp, reserveQuota } from '../src/server/limits';
-import { study, studyCacheKey } from '../src/server/study-service';
+import { bucketId, clientIp, reserveQuota, trustedProxyHops } from '../src/server/limits';
+import { study, studyCacheKey, studyGenerationVersion } from '../src/server/study-service';
 import { generateWithGemini } from '../src/server/gemini';
 import { boundedText, checkOrigin } from '../src/server/http';
 import type { StudyRequest, StudyResult } from '../src/lib/study';
@@ -27,6 +27,10 @@ test('atomic per-key/global quotas cannot overspend under concurrency and reset 
   assert.equal(await reserveQuota(store,'ip0',secret,10,3,now+2000),2);
   assert(!bucketId('127.0.0.1','2026-10-25',secret).includes('127.0.0.1'));
   assert.equal(clientIp(new Headers({'x-forwarded-for':'spoof, 192.0.2.5'})),'192.0.2.5');
+  assert.equal(clientIp(new Headers({'x-forwarded-for':'198.51.100.1, 192.0.2.5'}),2),'198.51.100.1');
+  assert.equal(clientIp(new Headers({'x-forwarded-for':'198.51.100.1'}),2),'unresolved');
+  assert.equal(clientIp(new Headers({'x-forwarded-for':'198.51.100.1'}),1.5),'unresolved');
+  assert.equal(trustedProxyHops('2'),2);for(const invalid of ['0','6','1.5','NaN'])assert.throws(()=>trustedProxyHops(invalid),/configured/);
 });
 test('matching standard answers persist across service instances and avoid Gemini/quota charges',async()=>{
   const store=new MemoryStore();let calls=0;
@@ -61,6 +65,10 @@ test('cache identity separates translation, action, model, versions and source d
   assert.notEqual(key,studyCacheKey(request,'other-model'));
   assert.notEqual(key,studyCacheKey(request,'model','2'));
   assert.notEqual(key,studyCacheKey(request,'model','1','other-data'));
+  const generation=studyGenerationVersion('model','1','source');
+  assert.notEqual(generation,studyGenerationVersion('model','2','source'));
+  assert.notEqual(generation,studyGenerationVersion('other-model','1','source'));
+  assert.notEqual(generation,studyGenerationVersion('model','1','other-source'));
 });
 test('invalid scope/questions and model-authored quotations fail validation',async()=>{
   for(const input of [{...request,action:'chapter-overview'},{...request,reference:'John 3'},{...request,translation:'NIV'},{...request,question:'unexpected'},{...request,action:'ask',question:'x'.repeat(501)},{...request,scripture:'Injected scripture'}])await assert.rejects(()=>study(input,'a',options()),/reference|question|valid passage/i);

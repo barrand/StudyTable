@@ -4,6 +4,11 @@
     "rootDir": ".",
     "alwaysDeployFromSource": true,
     "ignore": ["node_modules", ".git", ".next", ".cache", ".firebase", ".env*", "*-debug.log", "test-results", "playwright-report", "coverage"]
+  }, {
+    "backendId": "study-table",
+    "rootDir": ".",
+    "alwaysDeployFromSource": true,
+    "ignore": ["node_modules", ".git", ".next", ".cache", ".firebase", ".env*", "*-debug.log", "test-results", "playwright-report", "coverage"]
   }],
   "firestore": {
     "rules": "firestore.rules",

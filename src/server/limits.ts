@@ -3,9 +3,15 @@ import { isIP } from 'node:net';
 import type { Store } from './store';
 import { ServiceError } from './errors';
 export function bucketId(ip:string,date:string,secret:string) {return createHmac('sha256',secret).update(`${ip}|${date}`).digest('hex');}
+export function trustedProxyHops(value=process.env.TRUSTED_PROXY_HOPS) {
+  const hops=Number(value??1);
+  if(!Number.isInteger(hops)||hops<1||hops>5)throw new ServiceError(503,'Proxy request limits are not configured correctly.');
+  return hops;
+}
 export function clientIp(headers:Headers,hops=1) {
   const forwarded=headers.get('x-forwarded-for')?.split(',').map(value=>value.trim()) ?? [];
-  const candidate=forwarded[Math.max(0,forwarded.length-hops)];
+  if(!Number.isInteger(hops)||hops<1||hops>5||forwarded.length<hops)return 'unresolved';
+  const candidate=forwarded[forwarded.length-hops];
   return candidate&&isIP(candidate)?candidate:'unresolved';
 }
 export async function throttle(store:Store,identity:string,secret:string,namespace='study',limit=30,windowMs=60000,now=Date.now()) {

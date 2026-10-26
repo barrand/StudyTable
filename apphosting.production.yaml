@@ -1,0 +1,4 @@
+env:
+  - variable: APP_ORIGIN
+    value: https://study-table--study-table-a2869.us-central1.hosted.app
+    availability: [RUNTIME]

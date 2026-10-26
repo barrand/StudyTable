@@ -13,10 +13,11 @@ function VerseText({verse,number}:{verse?:Verse;number:number}) {
   return <>{verse.endVerse && <span className="combined">Combined verses {verse.number}–{verse.endVerse}{number!==verse.number?' (same passage)':''}. </span>}{verse.text}</>;
 }
 
-export default function Reader({book,chapters,initialTranslation,initialVerse}:{book:Book;chapters:Record<Translation,Chapter>;initialTranslation?:Translation;initialVerse?:number}) {
+export default function Reader({book,chapters,initialTranslation,initialVerse,generationVersion='local-test'}:{book:Book;chapters:Record<Translation,Chapter>;initialTranslation?:Translation;initialVerse?:number;generationVersion?:string}) {
   const chapter = chapters.WEB.chapter;
   const [primary,setPrimary] = useState<Translation>(initialTranslation ?? 'WEB');
   const [ready,setReady] = useState(false);
+  const [linkedVerse,setLinkedVerse] = useState(initialVerse);
   const [settings,setSettings] = useState(false);
   const [compare,setCompare] = useState(false);
   const [mobileVersion,setMobileVersion] = useState<Translation>(primary);
@@ -56,18 +57,22 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
   useEffect(()=>{
     try { const saved = localStorage.getItem('study-table:translation'); if (!initialTranslation && (saved==='WEB'||saved==='KJV')) {setPrimary(saved);setMobileVersion(saved);} } catch { /* Reading works without storage. */ }
     setReady(true);
+    setLinkedVerse(initialVerse);
     if (initialVerse) requestAnimationFrame(()=>document.getElementById(`verse-${initialVerse}`)?.scrollIntoView({block:'center'}));
     return ()=>{pending.current?.abort();};
   },[initialTranslation,initialVerse]);
   useEffect(()=>{if (!ready) return; try {
     localStorage.setItem('study-table:translation',primary);
-    localStorage.setItem('study-table:last-read',JSON.stringify({url:readerUrl({book:book.id,chapter,...(initialVerse?{verse:initialVerse}:{})},primary),label:`${book.name} ${chapter}`}));
-  } catch { /* Storage is optional. */ }},[ready,primary,book.id,book.name,chapter,initialVerse]);
+    localStorage.setItem('study-table:last-read',JSON.stringify({url:readerUrl({book:book.id,chapter,...(linkedVerse?{verse:linkedVerse}:{})},primary),label:`${book.name} ${chapter}${linkedVerse?`:${linkedVerse}`:''}`}));
+  } catch { /* Storage is optional. */ }
+    try {window.history.replaceState(window.history.state,'',readerUrl({book:book.id,chapter,...(linkedVerse?{verse:linkedVerse}:{})},primary));}catch{/* Reading works without history access. */}
+  },[ready,primary,book.id,book.name,chapter,linkedVerse]);
 
   function close() { epoch.current++;pending.current?.abort();setSelection(null);setLoading(false);lastTrigger.current?.focus({preventScroll:true}); }
   function select(next: Selection, trigger: HTMLElement) {
     epoch.current++; pending.current?.abort();lastTrigger.current=trigger;
     setAnswer(null);setError('');setQuestion('');setLoading(false);setSelection(next);setSettings(false);setConversation([]);conversationToken.current=undefined;
+    if(next.kind==='verse')setLinkedVerse(next.number);
   }
   useEffect(()=>{
     if (!selection) return;
@@ -83,7 +88,7 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
     pending.current?.abort();const controller=new AbortController();pending.current=controller;
     const requestEpoch=epoch.current;
     const input={reference:referenceLabel(selectedRef),translation:primary,action,...(customQuestion?{question:customQuestion.trim(),...(conversationToken.current?{conversationToken:conversationToken.current}:{})}:{})};
-    const key=JSON.stringify(input);
+    const key=JSON.stringify({generationVersion,...input});
     setError('');setAnswer(null);
     function accept(value:StudyAnswer) {
       if(action==='ask') {setConversation(previous=>[...previous,{question:customQuestion!.trim(),answer:value}].slice(-3));conversationToken.current=value.conversationToken;setQuestion('');setAnswer(null);}
@@ -113,7 +118,7 @@ export default function Reader({book,chapters,initialTranslation,initialVerse}:{
     <main id="main" className={`reader ${compare?'comparison':''}`}>
       <div className="chapter-tools"><button className="overview-button" aria-expanded={selection?.kind==='chapter'} aria-controls="study-panel" onClick={event=>select({kind:'chapter'},event.currentTarget)}><span aria-hidden="true">✦</span> Chapter overview <small>AI</small></button></div>
       {compare&&<><div className="chapter-translation-head" aria-hidden="true">{versions.map(v=><span key={v}>{v} · {TRANSLATIONS[v].name}</span>)}</div><div className="mobile-switch" aria-label="Comparison translation">{versions.map(v=><button key={v} aria-pressed={mobileVersion===v} onClick={()=>setMobileVersion(v)}>{v}</button>)}</div></>}
-      <div className="verses">{numbers.map(number=><div className={`verse-row ${selection?.kind==='verse'&&selection.number===number?'selected':''} ${initialVerse===number?'linked-verse':''}`} key={number} id={`verse-${number}`}>
+      <div className="verses">{numbers.map(number=><div className={`verse-row ${selection?.kind==='verse'&&selection.number===number?'selected':''} ${linkedVerse===number?'linked-verse':''}`} key={number} id={`verse-${number}`}>
         <button className="verse" aria-label={`Study ${book.name} ${chapter}:${number}`} aria-expanded={selection?.kind==='verse'&&selection.number===number} aria-controls="study-panel" onClick={event=>select({kind:'verse',number},event.currentTarget)}>{compare?<span className="verse-columns">{versions.map(v=><span className={`verse-column ${mobileVersion===v?'mobile-active':''}`} key={v}><sup>{number}</sup><VerseText verse={verseAt(chapters[v],number)} number={number}/></span>)}</span>:<><sup>{number}</sup><VerseText verse={verseAt(chapters[primary],number)} number={number}/></>}</button>
         <a className="verse-external" href={`https://biblehub.com/${book.bibleHub}/${chapter}-${number}.htm`} target="_blank" rel="noreferrer" aria-label={`Open ${book.name} ${chapter}:${number} in Bible Hub (external, new tab)`}>↗</a>
       </div>)}</div>
