@@ -37,7 +37,7 @@ Validated standard actions are cached in Firestore by passage, scope, translatio
 
 `TRUSTED_PROXY_HOPS` controls which trusted proxy-appended IP is used in both invite and study throttles. It defaults to the rightmost forwarded address, failing conservatively to one shared unresolved bucket if unavailable or the chain is too short. Live spoof-prefix probes verified that this bucket matches the platform request address and cannot be selected by supplied forwarding prefixes. This is a request bucket, not individual-user identity. IP-derived bucket IDs use a secret HMAC. Raw IPs and custom questions are not persisted by app code. Cloud request logs separately retain addresses/URLs in the project's 30-day `_Default` bucket; required audit logs have 400-day retention. No request bodies are logged by application code.
 
-## Firebase preview
+## Firebase deployments
 
 Target project: `study-table-a2869`. [Production](https://study-table--study-table-a2869.us-central1.hosted.app) uses backend `study-table`; [preview](https://study-table-preview--study-table-a2869.us-central1.hosted.app) uses `study-table-preview`, both in `us-central1`. Firestore's default database is in `nam5`. Rules deny all direct client access. Cloud TTL policies are active for quota, throttle, and generation-lease records; shared responses intentionally have no daily TTL.
 
@@ -50,11 +50,11 @@ Target project: `study-table-a2869`. [Production](https://study-table--study-tab
 | `STUDY_SESSION_SECRET` | Random signing secret, at least 32 characters |
 | `STUDY_RATE_LIMIT_SECRET` | Separate random HMAC secret, at least 32 characters |
 
-Never put secrets in Git, public environment variables, URLs, or chat. Grant the preview runtime access only to its named secrets and Firestore. Use `firebase deploy --only firestore --project study-table-a2869`, then `firebase deploy --only apphosting:study-table-preview --project study-table-a2869`. Test the private preview before creating a production rollout or GitHub automatic deployment. The main branch is the intended eventual production source.
+Never put secrets in Git, public environment variables, URLs, or chat. Grant the runtime access only to its named secrets and Firestore. Firestore configuration deploys with `firebase deploy --only firestore --project study-table-a2869`. For application releases, use the verified preview-then-production helper below. Both current deployments were released from pushed, CI-verified `main`.
 
 The separate production backend is `study-table` in the same owner-selected project. Its `production` environment loads `apphosting.production.yaml` to override the public origin; all secrets, the private invite gate, quotas, and cached responses remain shared. This is not project-level data isolation. `scripts/setup-production.ts` performs idempotent backend/secret setup without deploying the app. After committing and pushing, use `npx tsx scripts/release.ts preview`, then `npx tsx scripts/release.ts production`. The release helper refuses dirty/non-main/unpushed code, requires successful CI for the exact commit, verifies the same preview rollout before production, and runs deployed access/cache checks. No persistent GitHub deployment authorization is required; local source deployment is supported by Firebase. Automatic deployments can be connected later if desired.
 
-Next.js is pinned to patched 15.5.28, with PostCSS overridden to 8.5.31, replacing the original older 15.2.x requirement. App Hosting's published active-version table still lists 15.2.x; successful preview adapter/build validation is required for the newer minor. See the [Next.js security update](https://nextjs.org/blog/nextjs-security-update-october-14-2026) and [App Hosting framework support](https://firebase.google.com/docs/app-hosting/frameworks-tooling).
+Next.js is pinned to patched 15.5.28, with PostCSS overridden to 8.5.31, replacing the original older 15.2.x requirement. App Hosting's published active-version table still lists 15.2.x; the newer minor passed actual preview and production adapter/build validation. See the [Next.js security update](https://nextjs.org/blog/nextjs-security-update-october-14-2026) and [App Hosting framework support](https://firebase.google.com/docs/app-hosting/frameworks-tooling).
 
 ## Verified MVP release
 
