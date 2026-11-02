@@ -8,7 +8,9 @@ export async function boundedText(request:Request,maxBytes=4096) {
 }
 export function publicOrigin(request:Request) {return new URL(process.env.APP_ORIGIN??request.url).origin;}
 export function checkOrigin(request:Request) {
-  if(request.headers.get('origin')!==publicOrigin(request))throw new ServiceError(403,'This request must come from Study Table.');
+  const origin=request.headers.get('origin');
+  const allowed=[publicOrigin(request),...(process.env.APP_ORIGIN_ALIASES??'').split(',').map(value=>value.trim()).filter(Boolean).map(value=>new URL(value).origin)];
+  if(!origin||!allowed.includes(origin))throw new ServiceError(403,'This request must come from Study Table.');
 }
 export function errorResponse(error:unknown) {
   const known=error instanceof ServiceError;
